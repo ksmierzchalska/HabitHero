@@ -49,13 +49,19 @@
                         </a>
                     </li>
                     <li>
-                        {% if current_user.is_admin %}
-                        <a href="{{ url_for('admin_panel') }}" class="nav-card nav-card--admin">
-                            <span class="nav-icon">🔧</span>
-                            <span class="nav-text">Panel Admina</span>
+                        <a href="{{ url_for('logout') }}" class="nav-card">
+                            <span class="nav-icon">🚪</span>
+                            <span class="nav-text">Wyloguj</span>
                         </a>
-                        {% endif %}      
                     </li>
+                    {% if current_user.is_admin %}
+                        <li>
+                            <a href="{{ url_for('admin_panel') }}" class="nav-card nav-card--admin">
+                                <span class="nav-icon">🔧</span>
+                                <span class="nav-text">Panel Admina</span>
+                            </a>
+                        </li>
+                    {% endif %}
                 </ul>
             </div>
         </nav>
@@ -109,7 +115,7 @@
     <script>
     document.addEventListener('DOMContentLoaded', function() {
         const flashMessages = document.querySelectorAll('.flash');
-        
+
         // Wyświetl tylko JEDNO najnowsze powiadomienie
         if (flashMessages.length > 1) {
             // Ukryj wszystkie oprócz ostatniego
@@ -117,7 +123,7 @@
                 flashMessages[i].style.display = 'none';
             }
         }
-        
+
         // Automatyczne chowanie ostatniego komunikatu
         if (flashMessages.length > 0) {
             const lastMessage = flashMessages[flashMessages.length - 1];

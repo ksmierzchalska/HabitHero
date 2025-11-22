@@ -744,6 +744,13 @@ def login():
             flash('Niepoprawny email', 'error')
     return render_template('login.html', form=form)
 
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    flash('Zostałeś wylogowany', 'info')
+    return redirect(url_for('index'))
+
 # ENDPOINTY - PROFIL I CELE
 
 @app.route('/profile')
