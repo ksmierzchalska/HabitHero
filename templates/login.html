@@ -1,0 +1,51 @@
+{% extends 'base.html' %} 
+
+{% block title %}Logowanie - HabitHero{% endblock %}
+
+{% block body %}
+<div class="login-page">
+    <div class="login-container">
+        <header class="login-header">
+            <h1 class="login-title">
+                Logowanie
+            </h1>
+            <p class="login-subtitle">Zaloguj się do swojego konta HabitHero</p>
+        </header>
+
+        <main class="login-main">
+            <form method="POST" class="login-form" novalidate>
+                {{ form.hidden_tag() }}
+                
+                <div class="form-group">
+                    {{ form.email.label(class="form-label") }}
+                    {{ form.email(class="form-input", placeholder="wprowadź@email.pl" ) }}
+                    <div id="email-help" class="form-help">Podaj adres email użyty podczas rejestracji</div>
+                    {% for error in form.email.errors %}
+                    <div class="form-error" role="alert">{{ error }}</div>
+                    {% endfor %}
+                </div>
+
+                <div class="form-group">
+                    {{ form.password.label(class="form-label") }}
+                    {{ form.password(class="form-input", placeholder="Twoje hasło") }}
+                    <div id="password-help" class="form-help">Minimum 6 znaków</div>
+                    {% for error in form.password.errors %}
+                    <div class="form-error" role="alert">{{ error }}</div>
+                    {% endfor %}
+                </div>
+
+                <div class="form-actions">
+                    {{ form.submit(class="btn btn--primary btn--full") }}
+                </div>
+            </form>
+
+            <div class="login-links">
+                <p class="register-link">
+                    Nie masz jeszcze konta? 
+                    <a href="{{ url_for('registration') }}" class="link">Zarejestruj się</a>
+                </p>
+            </div>
+        </main>
+    </div>
+</div>
+{% endblock %}

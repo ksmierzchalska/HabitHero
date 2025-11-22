@@ -1,0 +1,284 @@
+{% extends 'base.html' %}
+
+{% block title %}Profil - {{ user.handle }}{% endblock %}
+
+{% block body %}
+<!-- POWIADOMIENIE O ODZNACE -->
+{% if session.get('show_badge_notification') and session.get('new_badges') %}
+{% set badge = session.new_badges[-1] %}
+<div class="badge-notification">
+    <div class="badge-overlay"></div>
+    <div class="badge-popup">
+        <h3>🎉 Nowa Odznaka! 🎉</h3>
+        <div class="badge-icon-large">🏅</div>
+        <h4>{{ badge.name }}</h4>
+        <p class="countdown">Powiadomienie zniknie za 5 sekund...</p>
+    </div>
+</div>
+<!-- <script>
+setTimeout(() => {
+    window.location.href = "{{ url_for('profile', clear_notification='true') }}";
+}, 5000);
+</script> -->
+<meta http-equiv="refresh" content="5;url={{ url_for('profile', clear_notification='true') }}">
+{% endif %}
+
+<main class="profile-page">
+    <!-- NAGŁÓWEK PROFILU -->
+    <header class="profile-header">
+        <div class="profile-info">
+            <h1 class="profile-title">
+                <span class="profile-avatar">👤</span>
+                {{ user.handle }}
+            </h1>
+            <p class="profile-level">Poziom {{ user.display_level or 1 }}</p>
+        </div>
+
+        <!-- PROGRES POZIOMU -->
+        {% set progress = current_user.level_progress or 0 %}
+        {% set maxp = current_user.level_max or 250 %}
+        {% set percentage = ((progress / maxp) * 100) | round | int %}
+        
+        <div class="progress-gradient" style="--progress: {{ percentage }}%">
+            <span class="progress-label">{{ percentage }}%</span>
+        </div>
+
+        <!-- NAWIGACJA -->
+        <nav class="profile-nav">
+            <div class="nav-grid">
+                <a href="{{ url_for('challenges') }}" class="nav-card">
+                    <span class="nav-icon">🎯</span>
+                    <span class="nav-text">Wyzwania</span>
+                </a>
+                <a href="{{ url_for('ranking') }}" class="nav-card">
+                    <span class="nav-icon">🏆</span>
+                    <span class="nav-text">Ranking</span>
+                </a>
+                <a href="{{ url_for('history') }}" class="nav-card">
+                    <span class="nav-icon">📊</span>
+                    <span class="nav-text">Historia</span>
+                </a>
+                <a href="{{ url_for('habits') }}" class="nav-card">
+                    <span class="nav-icon">⚡</span>
+                    <span class="nav-text">Nawyki</span>
+                </a>
+                <a href="{{ url_for('dashboard') }}" class="nav-card">
+                    <span class="nav-icon">📈</span>
+                    <span class="nav-text">Dashboard</span>
+                </a>
+                <a href="{{ url_for('settings') }}" class="nav-card">
+                    <span class="nav-icon">⚙️</span>
+                    <span class="nav-text">Ustawienia</span>
+                </a>
+                {% if user.is_admin %}
+                <a href="{{ url_for('admin_panel') }}" class="nav-card nav-card--admin">
+                    <span class="nav-icon">🔧</span>
+                    <span class="nav-text">Panel Admina</span>
+                </a>
+                {% endif %}
+            </div>
+        </nav>
+    </header>
+
+    <!-- GŁÓWNA ZAWARTOŚĆ -->
+    <div class="profile-content">
+        <!-- LEWA KOLUMNA - CELE -->
+        <div class="content-column">
+            <section class="goals-section">
+                <header class="section-header">
+                    <h2 class="section-title">
+                        <span class="section-icon">🎯</span>
+                        Twoje cele
+                    </h2>
+                </header>
+
+                <!-- FORMULARZ DODAWANIA CELU -->
+                <article class="add-goal-card">
+                    <h3 class="card-title">Dodaj nowy cel</h3>
+                    <form method="POST" action="{{ url_for('add_main_goal') }}" class="goal-form">
+                        {{ add_form.hidden_tag() }}
+                        <div class="form-row">
+                            <div class="form-group">
+                                {{ add_form.name.label(class="form-label") }}
+                                {{ add_form.name(class="form-input", placeholder="np. Codzienny jogging przez 30 dni") }}
+                                <div class="form-help">Opisz swój cel w kilku słowach</div>
+                            </div>
+                            <div class="form-group">
+                                {{ add_form.duration_days.label(class="form-label") }}
+                                {{ add_form.duration_days(class="form-input", placeholder="30") }}
+                                <div class="form-help">Liczba dni</div>
+                            </div>
+                        </div>
+                        {{ add_form.submit(class="btn btn--primary btn--full") }}
+                    </form>
+                </article>
+
+                <!-- LISTA AKTYWNYCH CELÓW -->
+                <div class="goals-list">
+                    {% if goals %}
+                        {% for goal in goals %}
+                            {% if request.args.get('edit') == goal.id|string %}
+                            <!-- FORMULARZ EDYCJI -->
+                            <article class="goal-card goal-card--editing">
+                                <h3 class="card-title">Edytuj cel</h3>
+                                <form method="POST" action="{{ url_for('update_goal') }}" class="goal-form">
+                                    {{ edit_form.hidden_tag() }}
+                                    <input type="hidden" name="goal_id" value="{{ goal.id }}">
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            {{ edit_form.name.label(class="form-label") }}
+                                            {{ edit_form.name(class="form-input", value=goal.name) }}
+                                        </div>
+                                        <div class="form-group">
+                                            {{ edit_form.duration_days.label(class="form-label") }}
+                                            {{ edit_form.duration_days(class="form-input", value=goal.duration_days) }}
+                                        </div>
+                                    </div>
+                                    <div class="form-actions">
+                                        {{ edit_form.submit(class="btn btn--primary") }}
+                                        <a href="{{ url_for('profile') }}" class="btn btn--secondary">Anuluj</a>
+                                    </div>
+                                </form>
+                            </article>
+                            {% else %}
+                            <!-- KARTA CELU -->
+                            <article class="goal-card">
+                                <header class="goal-header">
+                                    <h3 class="goal-title">{{ goal.name }}</h3>
+                                    <div class="goal-meta">
+                                        <span class="goal-duration">{{ goal.duration_days }} dni</span>
+                                        <span class="goal-created">Utworzono: {{ goal.created.strftime('%d.%m.%Y') }}</span>
+                                    </div>
+                                </header>
+                                <footer class="goal-actions">
+                                    <a href="?edit={{ goal.id }}" class="btn btn--outline">
+                                        <span class="btn-icon">✏️</span>
+                                        Edytuj
+                                    </a>
+                                    <form method="POST" action="{{ url_for('complete_goal', goal_id=goal.id) }}" class="action-form">
+                                        <button type="submit" class="btn btn--success">
+                                            <span class="btn-icon">✅</span>
+                                            Zakończ
+                                        </button>
+                                    </form>
+                                    <form method="POST" action="{{ url_for('delete_goal', goal_id=goal.id) }}" class="action-form">
+                                        <button type="submit" class="btn btn--danger" 
+                                                data-goal-name="{{ goal.name }}"
+                                                onclick="return confirmDelete(this)">
+                                            <span class="btn-icon">🗑️</span>
+                                            Usuń
+                                        </button>
+                                    </form>
+                                </footer>
+                            </article>
+                            {% endif %}
+                        {% endfor %}
+                    {% else %}
+                    <div class="empty-state">
+                        <div class="empty-state__icon">🎯</div>
+                        <h3 class="empty-state__title">Brak aktywnych celów</h3>
+                        <p class="empty-state__description">Dodaj swój pierwszy cel, aby rozpocząć podróż!</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </section>
+        </div>
+
+        <!-- PRAWA KOLUMNA - WYZWANIA I ODZNAKI -->
+        <div class="content-column">
+            <!-- WYZWANIA -->
+            <section class="challenges-section">
+                <header class="section-header">
+                    <h2 class="section-title">
+                        <span class="section-icon">⚔️</span>
+                        Aktywne wyzwania
+                    </h2>
+                </header>
+
+                {% if joined_challenges %}
+                <div class="challenges-grid">
+                    {% for challenge in joined_challenges %}
+                    <article class="challenge-card">
+                        <header class="challenge-header">
+                            <h3 class="challenge-title">{{ challenge.name }}</h3>
+                            <div class="challenge-badges">
+                                <span class="challenge-level challenge-level--{{ challenge.level | lower }}">
+                                    {{ challenge.level }}
+                                </span>
+                                <span class="challenge-xp">+{{ challenge.xp }} XP</span>
+                            </div>
+                        </header>
+                        <div class="challenge-details">
+                            <div class="detail-item">
+                                <span class="detail-label">Sekcja:</span>
+                                <span class="detail-value">{{ challenge.section_name }}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Czas trwania:</span>
+                                <span class="detail-value">{{ challenge.duration_days }} dni</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Dołączyłeś:</span>
+                                <span class="detail-value">{{ challenge.joined_at.strftime('%d.%m.%Y') }}</span>
+                            </div>
+                        </div>
+                        <footer class="challenge-actions">
+                            <form method="POST" action="{{ url_for('complete_challenge', challenge_id=challenge.id) }}">
+                                <button type="submit" class="btn btn--success btn--small">
+                                    <span class="btn-icon">🏁</span>
+                                    Ukończ
+                                </button>
+                            </form>
+                        </footer>
+                    </article>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="empty-state">
+                    <div class="empty-state__icon">⚔️</div>
+                    <h3 class="empty-state__title">Brak aktywnych wyzwań</h3>
+                    <p class="empty-state__description">Dołącz do wyzwań, aby zdobywać punkty rankingowe!</p>
+                    <a href="{{ url_for('challenges') }}" class="empty-state__action btn btn--primary">
+                        Przejdź do wyzwań
+                    </a>
+                </div>
+                {% endif %}
+            </section>
+
+            <!-- ODZNAKI -->
+            <section class="badges-section">
+                <header class="section-header">
+                    <h2 class="section-title">
+                        <span class="section-icon">🏆</span>
+                        Twoje odznaki
+                        <span class="section-count">({{ user_badges|length }})</span>
+                    </h2>
+                </header>
+
+                {% if user_badges %}
+                <div class="badges-grid">
+                    {% for badge in user_badges %}
+                    <article class="badge-card">
+                        <div class="badge-icon">🏅</div>
+                        <div class="badge-content">
+                            <h3 class="badge-title">{{ badge[1] }}</h3>
+                            <p class="badge-description">{{ badge[2] }}</p>
+                            <time class="badge-date" datetime="{{ badge[4].strftime('%Y-%m-%d') }}">
+                                Zdobyto: {{ badge[4].strftime('%d.%m.%Y') }}
+                            </time>
+                        </div>
+                    </article>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="empty-state">
+                    <div class="empty-state__icon">🏆</div>
+                    <h3 class="empty-state__title">Jeszcze nie masz odznak</h3>
+                    <p class="empty-state__description">Zdobywaj punkty i ukończ wyzwania, aby zdobywać odznaki!</p>
+                </div>
+                {% endif %}
+            </section>
+        </div>
+    </div>
+</main>
+{% endblock %}

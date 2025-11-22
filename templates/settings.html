@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+
+{% block title %}Ustawienia - HabitHero{% endblock %}
+
+{% block body %}
+<div class="settings-container">
+    <div class="settings-header">
+        <h1>⚙️ Ustawienia konta</h1>
+        <p>Dostosuj aplikację do swoich preferencji</p>
+    </div>
+
+    <div class="settings-content">
+        <!-- Formularz ustawień -->
+        <div class="settings-card">
+            <h2>Personalizacja</h2>
+            <form method="POST" action="{{ url_for('settings') }}">
+                {{ form.hidden_tag() }}
+                
+                <div class="settings-group">
+                    <h3>Preferencje</h3>
+                    
+                    <div class="setting-item">
+                        {{ form.daily_inspirations() }}
+                        {{ form.daily_inspirations.label }}
+                        <span class="setting-description">Codzienne inspiracje i motywacyjne cytaty w sekcji nawyków</span>
+                    </div>
+                    
+                    <div class="setting-item">
+                        {{ form.show_notifications() }}
+                        {{ form.show_notifications.label }}
+                        <span class="setting-description">Pokazuj powiadomienia i komunikaty w aplikacji</span>
+                    </div>
+                </div>
+
+                <div class="settings-group">
+                    <h3>Dane konta</h3>
+                    
+                    <div class="setting-item">
+                        {{ form.handle.label }}
+                        {{ form.handle() }}
+                        <span class="setting-description">Twoja publiczna nazwa wyświetlana w aplikacji</span>
+                    </div>
+                    
+                    <div class="setting-item">
+                        {{ form.new_password.label }}
+                        {{ form.new_password(placeholder="Zostaw puste jeśli nie chcesz zmieniać") }}
+                        <span class="setting-description">Minimum 6 znaków</span>
+                    </div>
+                    
+                    <div class="setting-item">
+                        {{ form.confirm_password.label }}
+                        {{ form.confirm_password(placeholder="Powtórz nowe hasło") }}
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    {{ form.submit(class="btn btn-primary") }}
+                    <a href="{{ url_for('profile') }}" class="btn btn-secondary">Anuluj</a>
+                </div>
+            </form>
+        </div>
+{% endblock %}

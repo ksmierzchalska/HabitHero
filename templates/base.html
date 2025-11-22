@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HabitHero</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    {% block head %}{% endblock %}
+</head>
+<body>
+
+    <!-- PRAWIDŁOWY WARUNEK DLA POWIADOMIEŃ -->
+    {% if current_user.is_authenticated %}
+        {% set user_settings = get_user_settings(current_user.id) %}
+        {% if user_settings and user_settings[1] == 1 %}  <!-- SHOW_NOTIFICATIONS = 1 -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                <div class="flash-messages">
+                    {% for category, message in messages %}
+                    <div class="flash {{ category or 'info' }}">{{ message }}</div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            {% endwith %}
+        {% endif %}
+    {% else %}
+        <!-- Dla niezalogowanych zawsze pokazuj -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+            <div class="flash-messages">
+                {% for category, message in messages %}
+                <div class="flash {{ category or 'info' }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+            {% endif %}
+        {% endwith %}
+    {% endif %}
+
+    {% block body %}
+    {% endblock %}
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const flashMessages = document.querySelectorAll('.flash');
+        
+        // Wyświetl tylko JEDNO najnowsze powiadomienie
+        if (flashMessages.length > 1) {
+            // Ukryj wszystkie oprócz ostatniego
+            for (let i = 0; i < flashMessages.length - 1; i++) {
+                flashMessages[i].style.display = 'none';
+            }
+        }
+        
+        // Automatyczne chowanie ostatniego komunikatu
+        if (flashMessages.length > 0) {
+            const lastMessage = flashMessages[flashMessages.length - 1];
+            setTimeout(() => {
+                lastMessage.style.opacity = '0';
+                setTimeout(() => {
+                    if (lastMessage.parentElement) {
+                        lastMessage.parentElement.removeChild(lastMessage);
+                    }
+                }, 500);
+            }, 5000);
+        }
+    });
+    </script>
+</body>
+</html>

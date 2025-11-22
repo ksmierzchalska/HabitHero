@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+
+{% block body %}
+<div class="history-page">
+    <div class="history-header">
+        <h1>📊 Twoja historia</h1>
+        <p>Przeglądaj ukończone cele, wyzwania oraz nieaktywne nawyki</p>
+    </div>
+    <div class="filters">
+        <strong>Pokaż:</strong>
+        <a href="?filter=all" class="filter-btn {% if filter_type == 'all' %}active{% endif %}">Wszystko</a>
+        <a href="?filter=goals" class="filter-btn {% if filter_type == 'goals' %}active{% endif %}">Cele</a>
+        <a href="?filter=challenges" class="filter-btn {% if filter_type == 'challenges' %}active{% endif %}">Wyzwania</a>
+        <a href="?filter=habits" class="filter-btn {% if filter_type == 'habits' %}active{% endif %}">Nawyki</a>
+    </div>
+    
+<!-- Cele główne -->
+    {% if filter_type in ['all', 'goals'] and completed_goals %}
+    <section class="history-section">
+        <h2>🎯 Ukończone cele ({{ completed_goals|length }})</h2>
+        {% for goal in completed_goals %}
+        <div class="item-card">
+            <h3>{{ goal[1] }}</h3>
+            <div class="item-details">
+                <span>{{ goal[2] }} dni</span>
+                <span>Utworzono: {{ goal[3].strftime('%d.%m.%Y') }}</span>
+                <span>Ukończono: {{ goal[4].strftime('%d.%m.%Y') if goal[4] else 'Nieznana data' }}</span>
+                <span class="points">+350 pkt</span>
+            </div>
+        </div>
+        {% endfor %}
+    </section>
+    {% endif %}
+
+    <!-- Wyzwania -->
+    {% if filter_type in ['all', 'challenges'] and completed_challenges %}
+    <section class="history-section">
+        <h2>🏆 Ukończone wyzwania ({{ completed_challenges|length }})</h2>
+        {% for challenge in completed_challenges %}
+        <div class="item-card">
+            <h3>{{ challenge[1] }}</h3>
+            <div class="item-details">
+                <span>Sekcja: {{ challenge[2] }}</span>
+                <span>{{ challenge[3] }} dni</span>
+                <span>Poziom: {{ challenge[4] }}</span>
+                <span class="points">+{{ challenge[5] }} pkt</span>
+                <span>Dołączono: {{ challenge[6].strftime('%d.%m.%Y') }}</span>
+                <span>Ukończono: {{ challenge[7].strftime('%d.%m.%Y') }}</span>
+            </div>
+        </div>
+        {% endfor %}
+    </section>
+    {% endif %}
+
+    <!-- Nawyki -->
+    {% if filter_type in ['all', 'habits'] and inactive_habits %}
+    <section class="history-section">
+        <h2>📋 Nieaktywne nawyki ({{ inactive_habits|length }})</h2>
+        {% for habit in inactive_habits %}
+        <div class="item-card">
+            <div class="habit-header">
+                <h3>{{ habit[1] }}</h3>
+                <div class="habit-actions">
+                    <form method="POST" action="{{ url_for('activate_habit', habit_id=habit[0]) }}">
+                        <button type="submit" class="btn-activate">▶️ Aktywuj</button>
+                    </form>
+                    <form method="POST" action="{{ url_for('delete_habit_permanently', habit_id=habit[0]) }}" 
+                          onsubmit="return confirm('Na pewno usunąć ten nawyk?')">
+                        <button type="submit" class="btn-delete">🗑️ Usuń</button>
+                    </form>
+                </div>
+            </div>
+            
+            {% if habit[2] %}
+            <p class="habit-desc">{{ habit[2] }}</p>
+            {% endif %}
+            
+            <div class="item-details">
+                <span>Cel: {{ habit[3] }} {{ habit[5] or '' }}</span>
+                <span>Ostatnia passa: {{ habit[8] }} dni</span>
+                <span>Najlepsza passa: {{ habit[9] }} dni</span>
+                <span>Kategoria: {{ habit[6] }}</span>
+            </div>
+        </div>
+        {% endfor %}
+    </section>
+    {% endif %}
+
+    <!-- Brak wyników -->
+    {% if (filter_type == 'all' and not completed_goals and not completed_challenges and not inactive_habits) or 
+          (filter_type == 'goals' and not completed_goals) or
+          (filter_type == 'challenges' and not completed_challenges) or
+          (filter_type == 'habits' and not inactive_habits) %}
+    <div class="no-results">
+        <p>📝 Nie znaleziono żadnych elementów</p>
+    </div>
+    {% endif %}
+
+    <!-- Przyciski -->
+    <div class="action-buttons">
+        <a href="{{ url_for('profile') }}" class="btn btn-back">← Profil</a>
+        <a href="{{ url_for('habits') }}" class="btn btn-primary">Nawyki →</a>
+    </div>
+</div>
+
+{% endblock %}

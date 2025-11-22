@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+
+{% block body %}
+<!-- POWIADOMIENIE O ODZNACE -->
+{% if session.get('show_badge_notification') and session.get('new_badges') %}
+{% set badge = session.new_badges[-1] %}
+<div class="badge-notification">
+    <div class="badge-overlay"></div>
+    <div class="badge-popup">
+        <h3>🎉 Nowa Odznaka! 🎉</h3>
+        <div class="badge-icon-large">🔥</div>
+        <h4>{{ badge.name }}</h4>
+        <p>{{ badge.description }}</p>
+        <p class="points">Zdobyto za {{ badge.days }} dni passy!</p>
+        <p class="countdown">Powiadomienie zniknie za 5 sekund...</p>
+    </div>
+</div>
+<meta http-equiv="refresh" content="5;url={{ url_for('habits', clear_notification='true') }}">
+{% endif %}
+
+<div class="habits-container">
+    <h1 class="page-title">Moje Nawyki</h1>
+
+    <!-- Przycisk do statystyk -->
+    <div class="stats-button-container">
+        <a href="{{ url_for('dashboard') }}" class="btn-outline">📊 Przejdź do statystyk</a>
+    </div>
+
+    <!-- KARTA INSPIRACJI -->
+    {% if daily_inspiration %}
+    <div class="inspiration-card">
+        <div class="inspiration-icon">💫</div>
+        <div class="inspiration-content">
+            <h3>Dzisiejsza inspiracja</h3>
+            <p>{{ daily_inspiration }}</p>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Formularz dodawania nawyku -->
+    <div class="card">
+        <h2>➕ Dodaj nowy nawyk</h2>
+        <form method="POST" action="{{ url_for('add_habit') }}" class="habit-form">
+            {{ habit_form.hidden_tag() }}
+            
+            <div class="form-row">
+                <div class="form-group">
+                    {{ habit_form.name.label }}
+                    {{ habit_form.name(placeholder="np. Picie wody") }}
+                </div>
+                <div class="form-group">
+                    {{ habit_form.target_value.label }}
+                    {{ habit_form.target_value(placeholder="8") }}
+                </div>
+                <div class="form-group">
+                    {{ habit_form.unit.label }}
+                    {{ habit_form.unit(placeholder="szklanki") }}
+                </div>
+                <div class="form-group">
+                    {{ habit_form.category.label }}
+                    {{ habit_form.category() }}
+                </div>
+            </div>
+            
+            <div class="form-group">
+                {{ habit_form.description.label }}
+                {{ habit_form.description(placeholder="Opis nawyku...") }}
+            </div>
+            
+            {{ habit_form.submit(class="btn-primary") }}
+        </form>
+    </div>
+
+    <!-- Lista nawyków -->
+    <div class="habits-list">
+        {% for habit in habits %}
+        <div class="habit-card">
+            <div class="habit-header">
+                <h3>{{ habit[1] }}</h3>
+                {% if habit[2] %}
+                <p class="habit-description">{{ habit[2] }}</p>
+                {% endif %}
+            </div>
+
+            <div class="habit-progress">
+                <div class="progress-bar">
+                    {% set progress_pct = (habit[4] / habit[3] * 100) if habit[3] > 0 else 0 %}
+                    <div class="progress-fill" >
+                        <span class="progress-text">{{ habit[4] }}/{{ habit[3] }} {{ habit[5] }}</span>
+                    </div>
+                </div>
+                
+                <div class="habit-stats">
+                    <span class="stat">Passa: {{ habit[8] }} dni</span>
+                    <span class="stat">Najlepsza: {{ habit[9] }} dni</span>
+                </div>
+            </div>
+
+            <div class="habit-actions">
+                <form method="POST" action="{{ url_for('update_habit_progress_route', habit_id=habit[0]) }}" class="progress-form">
+                    {{ progress_form.hidden_tag() }}
+                    <div class="input-group">
+                        {{ progress_form.value_achieved(placeholder=habit[3]) }}
+                        <span class="unit">{{ habit[5] or '' }}</span>
+                        {{ progress_form.submit(class="btn-success") }}
+                    </div>
+                </form>
+                
+                <div class="action-buttons">
+                    <form method="POST" action="{{ url_for('reset_habit', habit_id=habit[0]) }}">
+                        <button type="submit" class="btn-warning">🔄 Resetuj</button>
+                    </form>
+                    <form method="POST" action="{{ url_for('toggle_habit', habit_id=habit[0]) }}">
+                        <button type="submit" class="btn-secondary">
+                            ⏸️ Deaktywuj
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <h3>📝 Nie masz jeszcze nawyków</h3>
+            <p>Dodaj pierwszy nawyk korzystając z formularza powyżej!</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

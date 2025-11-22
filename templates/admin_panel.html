@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block body %}
+<div class="admin-panel">
+    <header class="admin-header">
+        <h1 class="admin-title">Panel administratora</h1>
+    </header>
+
+    <div class="admin-content">
+        <!-- Formularz dodawania sekcji -->
+        <section class="form-section">
+            <h2 class="form-title">Dodaj nową sekcję</h2>
+            <form method="POST" action="{{ url_for('add_section') }}" class="admin-form">
+                {{ section_form.hidden_tag() }}
+                
+                <div class="form-group">
+                    {{ section_form.name.label(class="form-label") }}
+                    {{ section_form.name(class="form-input", placeholder="Wprowadź nazwę sekcji") }}
+                </div>
+                
+                <div class="form-actions">
+                    {{ section_form.submit(class="btn btn-primary") }}
+                </div>
+            </form>
+        </section>
+
+        <div class="divider"></div>
+
+        <!-- Formularz dodawania wyzwania -->
+        <section class="form-section">
+            <h2 class="form-title">Dodaj nowe wyzwanie</h2>
+            <form method="POST" action="{{ url_for('add_challenge') }}" class="admin-form">
+                {{ challenge_form.hidden_tag() }}
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        {{ challenge_form.name.label(class="form-label") }}
+                        {{ challenge_form.name(class="form-input", placeholder="Nazwa wyzwania") }}
+                    </div>
+                    
+                    <div class="form-group">
+                        {{ challenge_form.section_id.label(class="form-label") }}
+                        {{ challenge_form.section_id(class="form-select") }}
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        {{ challenge_form.duration_days.label(class="form-label") }}
+                        {{ challenge_form.duration_days(class="form-input", type="number", min="1", placeholder="Liczba dni") }}
+                    </div>
+                    
+                    <div class="form-group">
+                        {{ challenge_form.level.label(class="form-label") }}
+                        {{ challenge_form.level(class="form-select") }}
+                    </div>
+                    
+                    <div class="form-group">
+                        {{ challenge_form.xp.label(class="form-label") }}
+                        {{ challenge_form.xp(class="form-input", type="number", min="0", placeholder="Punkty XP") }}
+                    </div>
+                </div>
+
+                <div class="form-group checkbox-group">
+                    {{ challenge_form.is_active(class="form-checkbox") }}
+                    {{ challenge_form.is_active.label(class="form-checkbox-label") }}
+                </div>
+
+                <div class="form-actions">
+                    {{ challenge_form.submit(class="btn btn-success") }}
+                </div>
+            </form>
+        </section>
+    </div>
+</div>
+{% endblock %}

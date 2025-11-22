@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+
+{% block head %}
+
+{% endblock %}
+
+{% block body %}
+<!-- Sekcja hero -->
+<div class="hero-section">
+    <h1 class="hero-title">HabitHero</h1>
+    <p class="hero-subtitle">Twoja droga do lepszych nawyków i zdrowszego życia</p>
+    <div class="cta-buttons">
+        <a href="{{ url_for('registration') }}" class="btn-primary">Zacznij teraz - za darmo</a>
+        <a href="{{ url_for('login') }}" class="btn-secondary">Mam już konto</a>
+    </div>
+</div>
+
+<!-- Sekcja funkcjonalności -->
+<div class="features-grid">
+    <div class="feature-card">
+        <h3 class="feature-title">Śledź swoje nawyki</h3>
+        <p class="feature-description">
+            Monitoruj codzienne aktywności i ustalaj cele. 
+            Obserwuj swoje postępy w przejrzysty sposób.
+        </p>
+    </div>
+
+    <div class="feature-card">
+        <h3 class="feature-title">Zdobywaj wyzwania</h3>
+        <p class="feature-description">
+            Dołączaj do różnorodnych wyzwań i zdobywaj odznaki. 
+            Pokonuj własne rekordy i rozwijaj się każdego dnia.
+        </p>
+    </div>
+
+    <div class="feature-card">
+        <h3 class="feature-title">Analizuj postępy</h3>
+        <p class="feature-description">
+            Szczegółowe statystyki i wizualizacja twoich osiągnięć. 
+            Śledź swoje passy i celebruj każdy sukces.
+        </p>
+    </div>
+
+    <div class="feature-card">
+        <h3 class="feature-title">Dołącz do społeczności</h3>
+        <p class="feature-description">
+            Nie jesteś sam w swojej drodze. Dołącz do innych użytkowników 
+            i wspierajcie się nawzajem w rozwoju.
+        </p>
+    </div>
+
+    <div class="feature-card">
+        <h3 class="feature-title">Osiągaj cele</h3>
+        <p class="feature-description">
+            Dziel duże cele na mniejsze, osiągalne kroki. 
+            System pomaga utrzymać długoterminową wizję.
+        </p>
+    </div>
+
+    <div class="feature-card">
+        <h3 class="feature-title">Codzienna motywacja</h3>
+        <p class="feature-description">
+            Otrzymuj inspiracje i przypomnienia. 
+            System motywacyjny pomaga w trudniejsze dni.
+        </p>
+    </div>
+
+    <div class="feature-card">
+        <h3 class="feature-title">Wsparcie w trudnych chwilach</h3>
+        <p class="feature-description">
+            Małe kroki do dużych zmian. Rutyna i struktura dnia 
+            pomagają budować poczucie sprawczości.
+        </p>
+    </div>
+
+    <div class="feature-card">
+        <h3 class="feature-title">Bez presji, zrozumienie</h3>
+        <p class="feature-description">
+            Możesz pauzować i wracać kiedy chcesz. 
+            Świętujemy każde, nawet najmniejsze osiągnięcie.
+        </p>
+    </div>
+</div>
+{% endblock %}
