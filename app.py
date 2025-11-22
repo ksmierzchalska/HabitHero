@@ -10,6 +10,8 @@ from datetime import datetime, timedelta
 import random
 
 
+
+
 # KONFIGURACJA BAZY DANYCH
 
 
@@ -130,7 +132,7 @@ def add_points_to_user(user_id, amount, source='general'):
     try:
         cursor.execute("""
             SELECT LEVEL_POINTS, LEVEL_THRESHOLD, CURRENT_LEVEL, TOTAL_POINTS, RANKING_POINTS
-            FROM USERS WHERE ID = ?
+            FROM USERS WHERE ID = %s
         """, (user_id,))
         data = cursor.fetchone()
 
@@ -156,21 +158,26 @@ def add_points_to_user(user_id, amount, source='general'):
             level += 1
             threshold += 250
 
-            # przyznanie odznaki jeśli jest przypisana
-            cursor.execute("SELECT ID, NAME, DESCRIPTION FROM BADGES WHERE REQUIRED_POINTS = ?", (threshold,))
-            badge = cursor.fetchone()
-            if badge:
-                cursor.execute("INSERT INTO USER_BADGES (USER_ID, BADGE_ID) VALUES (?, ?)", (user_id, badge[0]))
-                badges_earned.append({
-                    "id": badge[0],
-                    "name": badge[1],
-                    "description": badge[2]
-                })
+        # przyznanie odznaki jeśli jest przypisana
+        cursor.execute("SELECT ID, NAME, DESCRIPTION FROM BADGES WHERE CATEGORY = 'general' AND REQUIRED_POINTS <= %s", (total_points,))
+        badges = cursor.fetchall()
+
+        cursor.execute("SELECT BADGE_ID FROM USER_BADGES WHERE USER_ID = %s", (user_id,))
+        my_badges = cursor.fetchall()
+        to_get_badges = [badge for badge in badges if badge[0] not in [bdg[0] for bdg in my_badges]]
+
+        for badge in to_get_badges:
+            cursor.execute("INSERT INTO USER_BADGES (USER_ID, BADGE_ID) VALUES (%s, %s)", (user_id, badge[0]))
+            badges_earned.append({
+                "id": badge[0],
+                "name": badge[1],
+                "description": badge[2]
+            })
 
         cursor.execute("""
             UPDATE USERS
-            SET LEVEL_POINTS=?, LEVEL_THRESHOLD=?, CURRENT_LEVEL=?, TOTAL_POINTS=?, RANKING_POINTS=?
-            WHERE ID=?
+            SET LEVEL_POINTS=%s, LEVEL_THRESHOLD=%s, CURRENT_LEVEL=%s, TOTAL_POINTS=%s, RANKING_POINTS=%s
+            WHERE ID=%s
         """, (level_points, threshold, level, total_points, ranking_points, user_id))
         connection.commit()
 
@@ -190,7 +197,7 @@ def remove_points_from_user(user_id, amount, source='general'):
     try:
         cursor.execute("""
             SELECT LEVEL_POINTS, LEVEL_THRESHOLD, CURRENT_LEVEL, TOTAL_POINTS, RANKING_POINTS
-            FROM USERS WHERE ID = ?
+            FROM USERS WHERE ID = %s
         """, (user_id,))
         data = cursor.fetchone()
 
@@ -206,8 +213,8 @@ def remove_points_from_user(user_id, amount, source='general'):
 
         cursor.execute("""
             UPDATE USERS
-            SET LEVEL_POINTS=?, LEVEL_THRESHOLD=?, CURRENT_LEVEL=?, TOTAL_POINTS=?, RANKING_POINTS=?
-            WHERE ID=?
+            SET LEVEL_POINTS=%s, LEVEL_THRESHOLD=%s, CURRENT_LEVEL=%s, TOTAL_POINTS=%s, RANKING_POINTS=%s
+            WHERE ID=%s
         """, (level_points, threshold, level, total_points, ranking_points, user_id))
         connection.commit()
 
@@ -223,7 +230,7 @@ def get_user_badges(user_id):
             SELECT B.ID, B.NAME, B.DESCRIPTION, B.CATEGORY, UB.EARNED_AT
             FROM USER_BADGES UB
             JOIN BADGES B ON UB.BADGE_ID = B.ID
-            WHERE UB.USER_ID = ?
+            WHERE UB.USER_ID = %s
             ORDER BY UB.EARNED_AT DESC
         """, (user_id,))
         return cursor.fetchall()
@@ -246,7 +253,7 @@ def get_completed_goals(user_id):
         cursor.execute("""
             SELECT ID, NAME, DURATION_DAYS, CREATED, END_DATE
             FROM MAINGOALS
-            WHERE USER_ID = ? AND IS_ACTIVE = 0
+            WHERE USER_ID = %s AND IS_ACTIVE = 0
             ORDER BY END_DATE DESC
         """, (user_id,))
         return cursor.fetchall()
@@ -263,7 +270,7 @@ def get_completed_challenges(user_id):
             FROM CHALLENGES C
             JOIN SECTION S ON C.SECTION_ID = S.ID
             JOIN USERCHALLENGES UC ON C.ID = UC.CHALLENGEID
-            WHERE UC.USERID = ? AND UC.CompletedAt IS NOT NULL
+            WHERE UC.USERID = %s AND UC.CompletedAt IS NOT NULL
             ORDER BY UC.CompletedAt DESC
         """, (user_id,))
         return cursor.fetchall()
@@ -275,7 +282,7 @@ def get_top_users(limit=10):
     """Pobiera top użytkowników według RANKING_POINTS (tylko z wyzwań)"""
     try:
         cursor.execute("""
-            SELECT TOP (?) HANDLE, RANKING_POINTS, CURRENT_LEVEL
+            SELECT TOP (%s) HANDLE, RANKING_POINTS, CURRENT_LEVEL
             FROM USERS
             WHERE RANKING_POINTS > 0  -- Tylko użytkownicy z punktami z wyzwań
             ORDER BY RANKING_POINTS DESC
@@ -291,7 +298,7 @@ def get_user_settings(user_id):
     try:
         cursor.execute("""
             SELECT DAILY_INSPIRATIONS, SHOW_NOTIFICATIONS, HANDLE
-            FROM USERS WHERE ID = ?
+            FROM USERS WHERE ID = %s
         """, (user_id,))
         result = cursor.fetchone()
         print(f" DEBUG get_user_settings: user_id={user_id}, result={result}")
@@ -309,10 +316,9 @@ def get_daily_inspiration():
             return result[0]
         else:
             # Fallback jeśli baza jest pusta
-            return "💫 Każdy dzień to nowa szansa na lepszą wersję siebie!"
+            return "Każdy dzień to nowa szansa na lepszą wersję siebie!"
     except Exception as e:
-
-        return "🔥 Małe kroki prowadzą do wielkich celów - jesteś na dobrej drodze!"
+        return "Małe kroki prowadzą do wielkich celów - jesteś na dobrej drodze!"
 
 # =============================================================================
 # FUNKCJE DLA NAWYKÓW
@@ -325,7 +331,7 @@ def get_user_habits(user_id):
             SELECT ID, NAME, DESCRIPTION, TARGET_VALUE, CURRENT_VALUE, UNIT,
                    CATEGORY, COLOR, STREAK_DAYS, BEST_STREAK, IS_ACTIVE
             FROM HABITS
-            WHERE USER_ID = ? AND IS_ACTIVE = 1  -- TYLKO AKTYWNE
+            WHERE USER_ID = %s AND IS_ACTIVE = 1  -- TYLKO AKTYWNE
             ORDER BY CREATED_DATE DESC
         """, (user_id,))
         result = cursor.fetchall()
@@ -340,18 +346,18 @@ def update_habit_progress(habit_id, value_achieved):
         today = datetime.now().date()
 
         # Sprawdź czy potrzebny reset (nowy dzień)
-        cursor.execute("SELECT LAST_RESET_DATE FROM HABITS WHERE ID = ?", (habit_id,))
+        cursor.execute("SELECT LAST_RESET_DATE FROM HABITS WHERE ID = %s", (habit_id,))
         last_reset = cursor.fetchone()
 
         if last_reset and (last_reset[0] is None or last_reset[0] < today):
             # Resetuj przed dodaniem nowej wartości
-            cursor.execute("UPDATE HABITS SET CURRENT_VALUE = 0, LAST_RESET_DATE = ? WHERE ID = ?",
+            cursor.execute("UPDATE HABITS SET CURRENT_VALUE = 0, LAST_RESET_DATE = %s WHERE ID = %s",
                          (today, habit_id))
 
         # Pobierz aktualne dane nawyku
         cursor.execute("""
             SELECT CURRENT_VALUE, TARGET_VALUE, STREAK_DAYS, BEST_STREAK, USER_ID, IS_ACTIVE
-            FROM HABITS WHERE ID = ?
+            FROM HABITS WHERE ID = %s
         """, (habit_id,))
         habit = cursor.fetchone()
 
@@ -382,15 +388,15 @@ def update_habit_progress(habit_id, value_achieved):
         # Aktualizuj nawyk
         cursor.execute("""
             UPDATE HABITS
-            SET CURRENT_VALUE = ?, STREAK_DAYS = ?, BEST_STREAK = ?,
-                UPDATED_DATE = ?, LAST_RESET_DATE = ?
-            WHERE ID = ?
+            SET CURRENT_VALUE = %s, STREAK_DAYS = %s, BEST_STREAK = %s,
+                UPDATED_DATE = %s, LAST_RESET_DATE = %s
+            WHERE ID = %s
         """, (new_value, new_streak, best_streak, datetime.now(), today, habit_id))
 
         # Zapisz w historii
         cursor.execute("""
             INSERT INTO HABIT_LOGS (HABIT_ID, VALUE_ACHIEVED, TARGET_VALUE, LOG_DATE)
-            VALUES (?, ?, ?, ?)
+            VALUES (%s, %s, %s, %s)
         """, (habit_id, new_value, target_value, today))
 
         connection.commit()
@@ -415,7 +421,7 @@ def check_streak_badges(user_id, current_streak):
         cursor.execute("""
             SELECT ID, NAME, DESCRIPTION, REQUIRED_POINTS
             FROM BADGES
-            WHERE CATEGORY = 'streak' AND REQUIRED_POINTS = ?
+            WHERE CATEGORY = 'streak' AND REQUIRED_POINTS = %s
         """, (current_streak,))
 
         badge = cursor.fetchone()
@@ -428,7 +434,7 @@ def check_streak_badges(user_id, current_streak):
         # Sprawdź czy użytkownik już ma tę KONKRETNĄ odznakę
         cursor.execute("""
             SELECT 1 FROM USER_BADGES
-            WHERE USER_ID = ? AND BADGE_ID = ?
+            WHERE USER_ID = %s AND BADGE_ID = %s
         """, (user_id, badge_id))
 
         if cursor.fetchone():
@@ -437,7 +443,7 @@ def check_streak_badges(user_id, current_streak):
         # Przyznaj TYLKO TĘ JEDNĄ odznakę
         cursor.execute("""
             INSERT INTO USER_BADGES (USER_ID, BADGE_ID, EARNED_AT)
-            VALUES (?, ?, ?)
+            VALUES (%s, %s, %s)
         """, (user_id, badge_id, datetime.now()))
 
         awarded_badges = [{
@@ -464,7 +470,7 @@ def get_habit_stats(user_id, days=30):
     """Pobiera statystyki nawyków - TYLKO AKTYWNE"""
     try:
         # Najpierw sprawdźmy ile jest aktywnych nawyków
-        cursor.execute("SELECT COUNT(*) FROM HABITS WHERE USER_ID = ? AND IS_ACTIVE = 1", (user_id,))
+        cursor.execute("SELECT COUNT(*) FROM HABITS WHERE USER_ID = %s AND IS_ACTIVE = 1", (user_id,))
         active_count = cursor.fetchone()[0]
         print(f" Aktywnych nawyków: {active_count}")
 
@@ -479,9 +485,9 @@ def get_habit_stats(user_id, days=30):
                 H.BEST_STREAK
             FROM HABITS H
             LEFT JOIN HABIT_LOGS HL ON H.ID = HL.HABIT_ID
-                AND HL.LOG_DATE >= DATEADD(day, -?, GETDATE())
+                AND HL.LOG_DATE >= DATEADD(day, -%s, GETDATE())
                 AND HL.VALUE_ACHIEVED >= H.TARGET_VALUE
-            WHERE H.USER_ID = ? AND H.IS_ACTIVE = 1
+            WHERE H.USER_ID = %s AND H.IS_ACTIVE = 1
             GROUP BY H.ID, H.NAME, H.UNIT, H.STREAK_DAYS, H.BEST_STREAK
             ORDER BY H.STREAK_DAYS DESC
         """, (days, user_id))
@@ -489,7 +495,7 @@ def get_habit_stats(user_id, days=30):
         result = cursor.fetchall()
         print(f" Wynik zapytania: {len(result)} wierszy")
         for i, row in enumerate(result):
-            print(f"🔍 Nawyk {i+1}: {row[0]}, passa: {row[3]}, najlepsza: {row[5]}")
+            print(f"Nawyk {i+1}: {row[0]}, passa: {row[3]}, najlepsza: {row[5]}")
 
         return result
 
@@ -507,7 +513,7 @@ def get_weekly_progress(user_id):
                    COUNT(DISTINCT H.ID) as total_active_habits
             FROM HABIT_LOGS HL
             JOIN HABITS H ON HL.HABIT_ID = H.ID
-            WHERE H.USER_ID = ? AND HL.LOG_DATE >= DATEADD(day, -7, GETDATE())
+            WHERE H.USER_ID = %s AND HL.LOG_DATE >= DATEADD(day, -7, GETDATE())
             GROUP BY HL.LOG_DATE
             ORDER BY HL.LOG_DATE DESC
         """, (user_id,))
@@ -525,7 +531,7 @@ def get_weekly_progress(user_id):
 #                 COUNT(*) as total_habits,
 #                 SUM(CASE WHEN CURRENT_VALUE >= TARGET_VALUE THEN 1 ELSE 0 END) as completed_habits
 #             FROM HABITS
-#             WHERE USER_ID = ? AND IS_ACTIVE = 1
+#             WHERE USER_ID = %s AND IS_ACTIVE = 1
 #             GROUP BY CATEGORY
 #         """, (user_id,))
 #         return cursor.fetchall()
@@ -540,7 +546,7 @@ def get_current_streak(user_id):
             SELECT DISTINCT LOG_DATE
             FROM HABIT_LOGS HL
             JOIN HABITS H ON HL.HABIT_ID = H.ID
-            WHERE H.USER_ID = ? AND HL.VALUE_ACHIEVED >= H.TARGET_VALUE
+            WHERE H.USER_ID = %s AND HL.VALUE_ACHIEVED >= H.TARGET_VALUE
             ORDER BY LOG_DATE DESC
         """, (user_id,))
 
@@ -580,8 +586,8 @@ def get_streak_history(user_id, days=7):
             SELECT DISTINCT LOG_DATE
             FROM HABIT_LOGS HL
             JOIN HABITS H ON HL.HABIT_ID = H.ID
-            WHERE H.USER_ID = ? AND HL.VALUE_ACHIEVED >= H.TARGET_VALUE
-            AND HL.LOG_DATE >= DATEADD(day, -?, GETDATE())
+            WHERE H.USER_ID = %s AND HL.VALUE_ACHIEVED >= H.TARGET_VALUE
+            AND HL.LOG_DATE >= DATEADD(day, -%s, GETDATE())
             ORDER BY LOG_DATE DESC
         """, (user_id, days))
 
@@ -619,8 +625,8 @@ def reset_habits_daily():
 
         cursor.execute("""
             UPDATE HABITS
-            SET CURRENT_VALUE = 0, LAST_RESET_DATE = ?
-            WHERE (LAST_RESET_DATE IS NULL OR LAST_RESET_DATE < ?)
+            SET CURRENT_VALUE = 0, LAST_RESET_DATE = %s
+            WHERE (LAST_RESET_DATE IS NULL OR LAST_RESET_DATE < %s)
             AND IS_ACTIVE = 1
         """, (today, today))
 
@@ -648,7 +654,7 @@ def utility_processor():
         try:
             cursor.execute("""
                 SELECT DAILY_INSPIRATIONS, SHOW_NOTIFICATIONS, HANDLE
-                FROM USERS WHERE ID = ?
+                FROM USERS WHERE ID = %s
             """, (user_id,))
             return cursor.fetchone()
         except Exception as e:
@@ -667,7 +673,7 @@ def add_header(response):
 
 @login_manager.user_loader
 def load_user(user_id):
-    cursor.execute("SELECT ID, EMAIL, HANDLE, IS_ADMIN FROM USERS WHERE ID = ?", (user_id,))
+    cursor.execute("SELECT ID, EMAIL, HANDLE, IS_ADMIN FROM USERS WHERE ID = %s", (user_id,))
     row = cursor.fetchone()
     if row:
         return User(row[0], row[1], row[2], bool(row[3]))
@@ -684,13 +690,13 @@ def registration():
     form = RegistrationForm()
 
     if form.validate_on_submit():
-        cursor.execute('SELECT ID FROM USERS WHERE EMAIL = ?', (form.email.data,) )
+        cursor.execute('SELECT ID FROM USERS WHERE EMAIL = %s', (form.email.data,) )
         existing_email = cursor.fetchone()
         if existing_email:
             flash('Ten emial jest zajęty', 'warning')
             return render_template('registration.html', form=form)
 
-        cursor.execute('SELECT ID FROM USERS WHERE HANDLE =?', (form.handle.data,))
+        cursor.execute('SELECT ID FROM USERS WHERE HANDLE =%s', (form.handle.data,))
         existing_handle = cursor.fetchone()
         if existing_handle:
             flash('Nazwa jest zajęta', 'warning')
@@ -700,7 +706,7 @@ def registration():
         current_time = datetime.now()
 
         try:
-            cursor.execute('INSERT INTO USERS (EMAIL, PASSWORD, FIRSTNAME, LASTNAME, HANDLE, CREATED_DATE, MODIFIED_DATE) VALUES (?,?,?,?,?,?,?)',
+            cursor.execute('INSERT INTO USERS (EMAIL, PASSWORD, FIRSTNAME, LASTNAME, HANDLE, CREATED_DATE, MODIFIED_DATE) VALUES (%s,%s,%s,%s,%s,%s,%s)',
                             (form.email.data,
                             hashed_password,
                             form.firstname.data,
@@ -723,7 +729,7 @@ def registration():
 def login():
     form = LoginForm()
     if form.validate_on_submit():
-        cursor.execute('SELECT ID, EMAIL, PASSWORD, HANDLE, IS_ADMIN FROM USERS WHERE EMAIL =?', (form.email.data,))
+        cursor.execute('SELECT ID, EMAIL, PASSWORD, HANDLE, IS_ADMIN FROM USERS WHERE EMAIL =%s', (form.email.data,))
         user_exist = cursor.fetchone()
         if user_exist:
             stored_hash = user_exist[2]
@@ -744,7 +750,7 @@ def login():
 @login_required
 def profile():
     # Pobierz aktywne główne cele
-    cursor.execute("SELECT ID, NAME, DURATION_DAYS, CREATED, IS_ACTIVE FROM MAINGOALS WHERE USER_ID = ? AND IS_ACTIVE = 1 ORDER BY CREATED DESC", (current_user.id,))
+    cursor.execute("SELECT ID, NAME, DURATION_DAYS, CREATED, IS_ACTIVE FROM MAINGOALS WHERE USER_ID = %s AND IS_ACTIVE = 1 ORDER BY CREATED DESC", (current_user.id,))
     goals_raw = cursor.fetchall()
 
     goals = [
@@ -764,7 +770,7 @@ def profile():
         FROM CHALLENGES C
         JOIN SECTION S ON C.SECTION_ID = S.ID
         JOIN USERCHALLENGES UC ON C.ID = UC.CHALLENGEID
-        WHERE UC.USERID = ? AND C.IS_ACTIVE = 1 AND UC.CompletedAt IS NULL
+        WHERE UC.USERID = %s AND C.IS_ACTIVE = 1 AND UC.CompletedAt IS NULL
         ORDER BY UC.JoinedAt DESC
     """, (current_user.id,))
     challenges_raw = cursor.fetchall()
@@ -786,8 +792,8 @@ def profile():
     add_form = MainGoalForm()
     edit_form = EditGoalForm()
 
-    # ✅ Pobieramy aktualny progres LEVEL_POINTS i LEVEL_THRESHOLD
-    cursor.execute("SELECT TOTAL_POINTS, CURRENT_LEVEL, LEVEL_POINTS, LEVEL_THRESHOLD FROM USERS WHERE ID = ?", (current_user.id,))
+    # Pobieramy aktualny progres LEVEL_POINTS i LEVEL_THRESHOLD
+    cursor.execute("SELECT TOTAL_POINTS, CURRENT_LEVEL, LEVEL_POINTS, LEVEL_THRESHOLD FROM USERS WHERE ID = %s", (current_user.id,))
     user_data = cursor.fetchone()
 
     current_user.total_points = user_data[0]
@@ -830,7 +836,7 @@ def add_main_goal():
     form = MainGoalForm()
     if form.validate_on_submit():
         try:
-            cursor.execute("INSERT INTO MAINGOALS (NAME, DURATION_DAYS, USER_ID, IS_ACTIVE, CREATED) VALUES (?,?,?,1,?)",
+            cursor.execute("INSERT INTO MAINGOALS (NAME, DURATION_DAYS, USER_ID, IS_ACTIVE, CREATED) VALUES (%s,%s,%s,1,%s)",
                          (form.name.data, form.duration_days.data, current_user.id, datetime.now()))
             connection.commit()
             flash("Główny cel został dodany", 'success')
@@ -847,7 +853,7 @@ def update_goal():
     form = EditGoalForm()
     if form.validate_on_submit():
         try:
-            cursor.execute("UPDATE MAINGOALS SET NAME = ?, DURATION_DAYS = ? WHERE ID = ? AND USER_ID = ?",
+            cursor.execute("UPDATE MAINGOALS SET NAME = %s, DURATION_DAYS = %s WHERE ID = %s AND USER_ID = %s",
                          (form.name.data, form.duration_days.data, form.goal_id.data, current_user.id))
             connection.commit()
             flash("Cel został zaaktualizowany", 'success')
@@ -863,12 +869,12 @@ def update_goal():
 def complete_goal(goal_id):
     try:
         # Pobierz informacje o celu przed ukończeniem
-        cursor.execute("SELECT NAME FROM MAINGOALS WHERE ID = ? AND USER_ID = ?",
+        cursor.execute("SELECT NAME FROM MAINGOALS WHERE ID = %s AND USER_ID = %s",
                      (goal_id, current_user.id))
         goal = cursor.fetchone()
 
         if goal:
-            cursor.execute("UPDATE MAINGOALS SET IS_ACTIVE = 0, END_DATE = ? WHERE ID = ? AND USER_ID = ?",
+            cursor.execute("UPDATE MAINGOALS SET IS_ACTIVE = 0, END_DATE = %s WHERE ID = %s AND USER_ID = %s",
                          (datetime.now(), goal_id, current_user.id))
             connection.commit()
             # PUNKTY Z CELÓW SĄ PRYWATNE (NIE do rankingu)
@@ -886,7 +892,7 @@ def complete_goal(goal_id):
 @login_required
 def reactivate_goal(goal_id):
     try:
-        cursor.execute("UPDATE MAINGOALS SET IS_ACTIVE = 1, END_DATE = NULL WHERE ID = ? AND USER_ID = ?",
+        cursor.execute("UPDATE MAINGOALS SET IS_ACTIVE = 1, END_DATE = NULL WHERE ID = %s AND USER_ID = %s",
                      (goal_id, current_user.id))
         connection.commit()
         flash("Cel został aktywowany", 'info')
@@ -899,7 +905,7 @@ def reactivate_goal(goal_id):
 @login_required
 def delete_goal(goal_id):
     try:
-        cursor.execute("DELETE FROM MAINGOALS WHERE ID = ? AND USER_ID = ?",
+        cursor.execute("DELETE FROM MAINGOALS WHERE ID = %s AND USER_ID = %s",
                      (goal_id, current_user.id))
         connection.commit()
         flash("Cel został usunięty", 'warning')
@@ -908,9 +914,9 @@ def delete_goal(goal_id):
         flash(f"Nie udało się usunąć celu: {e}", 'error')
     return redirect(url_for('profile'))
 
-# =============================================================================
+
 # ENDPOINTY - WYZWANIA
-# =============================================================================
+
 
 @app.route('/challenges')
 @login_required
@@ -925,7 +931,7 @@ def challenges():
                 WHERE C.IS_ACTIVE = 1"""
 
     if selected_level != 'all':
-        query += "AND C.LEVEL = ?"
+        query += " AND C.LEVEL = %s"
         params = (selected_level,)
     else:
         params = ()
@@ -953,14 +959,14 @@ def challenges():
 @login_required
 def join_challenge(challenge_id):
     try:
-        cursor.execute("SELECT * FROM USERCHALLENGES WHERE USERID = ? AND CHALLENGEID = ?", (current_user.id, challenge_id))
+        cursor.execute("SELECT * FROM USERCHALLENGES WHERE USERID = %s AND CHALLENGEID = %s", (current_user.id, challenge_id))
         existing = cursor.fetchone()
 
         if existing:
             flash("Już dołączyłeś do tego wyzwania", 'warning')
             return redirect(url_for('challenges'))
 
-        cursor.execute("INSERT INTO USERCHALLENGES (USERID, CHALLENGEID, JoinedAt) VALUES (?, ?, ?)",
+        cursor.execute("INSERT INTO USERCHALLENGES (USERID, CHALLENGEID, JoinedAt) VALUES (%s, %s, %s)",
                      (current_user.id, challenge_id, datetime.now()))
         connection.commit()
         flash("Dołączyłeś do wyzwania", 'success')
@@ -977,13 +983,14 @@ def complete_challenge(challenge_id):
         cursor.execute("""SELECT C.XP, UC.CompletedAt
                        FROM CHALLENGES C
                        JOIN USERCHALLENGES UC ON C.ID = UC.CHALLENGEID
-                       WHERE UC.USERID = ? AND UC.CHALLENGEID = ?""",
+                       WHERE UC.USERID = %s AND UC.CHALLENGEID = %s""",
                      (current_user.id, challenge_id))
         result = cursor.fetchone()
 
         if result and not result[1]:
             challenge_xp = result[0]
-            cursor.execute("UPDATE USERCHALLENGES SET CompletedAt = ? WHERE USERID = ? AND CHALLENGEID = ?",
+
+            cursor.execute("UPDATE USERCHALLENGES SET CompletedAt = %s WHERE USERID = %s AND CHALLENGEID = %s",
                          (datetime.now(), current_user.id, challenge_id))
 
             # PUNKTY Z WYZWAŃ IDĄ DO RANKINGU
@@ -998,9 +1005,9 @@ def complete_challenge(challenge_id):
         flash(f"Błąd przy ukończeniu wyzwania: {e}", 'error')
     return redirect(url_for('profile'))
 
-# =============================================================================
+
 # ENDPOINTY - ADMIN
-# =============================================================================
+
 
 @app.route('/admin', methods=['GET', 'POST'])
 @login_required
@@ -1029,7 +1036,7 @@ def add_section():
 
     form = SectionForm()
     if form.validate_on_submit():
-        cursor.execute("INSERT INTO SECTION (NAME) VALUES (?)", (form.name.data,))
+        cursor.execute("INSERT INTO SECTION (NAME) VALUES (%s)", (form.name.data,))
         connection.commit()
         flash("Sekcja została dodana!", 'success')
     else:
@@ -1050,7 +1057,7 @@ def add_challenge():
     if form.validate_on_submit():
         cursor.execute("""
             INSERT INTO CHALLENGES (NAME, SECTION_ID, DURATION_DAYS, LEVEL, XP, IS_ACTIVE)
-            VALUES (?, ?, ?, ?, ?, ?)
+            VALUES (%s, %s, %s, %s, %s, %s)
         """, (form.name.data, form.section_id.data, form.duration_days.data,
               form.level.data, form.xp.data, int(form.is_active.data)))
         connection.commit()
@@ -1059,9 +1066,9 @@ def add_challenge():
         flash("Błąd w formularzu wyzwania.", 'error')
     return redirect(url_for('admin_panel'))
 
-# =============================================================================
+
 # ENDPOINTY - NAWYKI
-# =============================================================================
+
 
 @app.route('/habits')
 @login_required
@@ -1103,7 +1110,7 @@ def add_habit():
         try:
             cursor.execute("""
                 INSERT INTO HABITS (USER_ID, NAME, DESCRIPTION, TARGET_VALUE, UNIT, CATEGORY, COLOR)
-                VALUES (?, ?, ?, ?, ?, ?, ?)
+                VALUES (%s, %s, %s, %s, %s, %s, %s)
             """, (current_user.id, form.name.data, form.description.data,
                   form.target_value.data, form.unit.data, form.category.data,
                   form.color.data or '#3B82F6'))  # USUNIĘTO ICON
@@ -1141,7 +1148,7 @@ def reset_habit(habit_id):
         # Sprawdź czy nawyk miał dzisiaj osiągnięty cel
         cursor.execute("""
             SELECT CURRENT_VALUE, TARGET_VALUE, NAME, STREAK_DAYS, BEST_STREAK
-            FROM HABITS WHERE ID = ? AND USER_ID = ?
+            FROM HABITS WHERE ID = %s AND USER_ID = %s
         """, (habit_id, current_user.id))
 
         habit_data = cursor.fetchone()
@@ -1161,14 +1168,14 @@ def reset_habit(habit_id):
         cursor.execute("""
             UPDATE HABITS
             SET CURRENT_VALUE = 0, STREAK_DAYS = 0, BEST_STREAK = 0
-            WHERE ID = ? AND USER_ID = ?
+            WHERE ID = %s AND USER_ID = %s
         """, (habit_id, current_user.id))
 
-        cursor.execute("DELETE FROM HABIT_LOGS WHERE HABIT_ID = ?", (habit_id,))
+        cursor.execute("DELETE FROM HABIT_LOGS WHERE HABIT_ID = %s", (habit_id,))
         connection.commit()
 
         # Debug info
-        print(f"🔍 RESET: {habit_name}, passa: {streak_days} → 0, najlepsza: {best_streak} → 0")
+        print(f" RESET: {habit_name}, passa: {streak_days} → 0, najlepsza: {best_streak} → 0")
 
         if points_to_remove > 0:
             flash(f'Nawyk "{habit_name}" zresetowany! Odebrano {points_to_remove} punktów.', 'warning')
@@ -1177,7 +1184,7 @@ def reset_habit(habit_id):
 
     except Exception as e:
         connection.rollback()
-        print(f"❌ Błąd przy resetowaniu: {e}")
+        print(f"Błąd przy resetowaniu: {e}")
         flash(f'Błąd przy resetowaniu: {e}', 'error')
 
     return redirect(url_for('habits'))
@@ -1187,13 +1194,13 @@ def reset_habit(habit_id):
 def toggle_habit(habit_id):
     """Aktywuje/deaktywuje nawyk - DEAKTYWOWANE NIE POKAZUJĄ SIĘ W DASHBOARD"""
     try:
-        cursor.execute("SELECT IS_ACTIVE FROM HABITS WHERE ID = ? AND USER_ID = ?",
+        cursor.execute("SELECT IS_ACTIVE FROM HABITS WHERE ID = %s AND USER_ID = %s",
                      (habit_id, current_user.id))
         habit = cursor.fetchone()
 
         if habit:
             new_status = not habit[0]
-            cursor.execute("UPDATE HABITS SET IS_ACTIVE = ? WHERE ID = ?",
+            cursor.execute("UPDATE HABITS SET IS_ACTIVE = %s WHERE ID = %s",
                          (new_status, habit_id))
             connection.commit()
 
@@ -1208,9 +1215,9 @@ def toggle_habit(habit_id):
 
     return redirect(url_for('habits'))
 
-# =============================================================================
+
 # ENDPOINTY - DASHBOARD I STATYSTYKI
-# =============================================================================
+
 
 @app.route('/dashboard')
 @login_required
@@ -1223,8 +1230,8 @@ def dashboard():
         session.pop('new_badges', None)
         return redirect(url_for('dashboard'))
 
-    # ✅ Pobierz aktualne punkty użytkownika
-    cursor.execute("SELECT TOTAL_POINTS, CURRENT_LEVEL, LEVEL_POINTS, LEVEL_THRESHOLD FROM USERS WHERE ID = ?", (current_user.id,))
+    # pobierz aktualne punkty użytkownika
+    cursor.execute("SELECT TOTAL_POINTS, CURRENT_LEVEL, LEVEL_POINTS, LEVEL_THRESHOLD FROM USERS WHERE ID = %s", (current_user.id,))
     user_data = cursor.fetchone()
 
     current_user.total_points = user_data[0] or 0
@@ -1251,9 +1258,9 @@ def dashboard():
                          streak_history=streak_history,
                          user_badges=user_badges)
 
-# =============================================================================
+
 # ENDPOINTY - HISTORIA I RANKING
-# =============================================================================
+
 
 @app.route('/history')
 @login_required
@@ -1270,7 +1277,7 @@ def history():
             SELECT ID, NAME, DESCRIPTION, TARGET_VALUE, CURRENT_VALUE, UNIT,
                    CATEGORY, COLOR, STREAK_DAYS, BEST_STREAK, IS_ACTIVE
             FROM HABITS
-            WHERE USER_ID = ? AND IS_ACTIVE = 0
+            WHERE USER_ID = %s AND IS_ACTIVE = 0
             ORDER BY CREATED_DATE DESC
         """, (current_user.id,))
         inactive_habits = cursor.fetchall()
@@ -1293,7 +1300,7 @@ def activate_habit(habit_id):
         cursor.execute("""
             UPDATE HABITS
             SET IS_ACTIVE = 1
-            WHERE ID = ? AND USER_ID = ? AND IS_ACTIVE = 0
+            WHERE ID = %s AND USER_ID = %s AND IS_ACTIVE = 0
         """, (habit_id, current_user.id))
 
         if cursor.rowcount > 0:
@@ -1315,10 +1322,10 @@ def delete_habit_permanently(habit_id):
     """Trwale usuwa nieaktywny nawyk z historii"""
     try:
         # Najpierw usuń historię
-        cursor.execute("DELETE FROM HABIT_LOGS WHERE HABIT_ID = ?", (habit_id,))
+        cursor.execute("DELETE FROM HABIT_LOGS WHERE HABIT_ID = %s", (habit_id,))
 
         # Potem usuń nawyk
-        cursor.execute("DELETE FROM HABITS WHERE ID = ? AND USER_ID = ?", (habit_id, current_user.id))
+        cursor.execute("DELETE FROM HABITS WHERE ID = %s AND USER_ID = %s", (habit_id, current_user.id))
 
         if cursor.rowcount > 0:
             connection.commit()
@@ -1341,9 +1348,9 @@ def ranking():
                          user=current_user,
                          top_users=top_users)
 
-# =============================================================================
+
 # ENDPOINTY - USTAWIENIA
-# =============================================================================
+
 
 @app.route('/settings', methods=['GET', 'POST'])
 @login_required
@@ -1364,7 +1371,8 @@ def settings():
         try:
             # Sprawdź czy nazwa użytkownika jest dostępna
             if form.handle.data != current_user.handle:
-                cursor.execute('SELECT id FROM USERS WHERE HANDLE = ? AND ID != ?',
+
+                cursor.execute('SELECT id FROM USERS WHERE HANDLE = %s AND ID != %s',
                              (form.handle.data, current_user.id))
                 existing_handle = cursor.fetchone()
                 if existing_handle:
@@ -1375,29 +1383,29 @@ def settings():
             update_fields = []
             params = []
 
-            update_fields.append("HANDLE = ?")
+            update_fields.append("HANDLE = %s")
             params.append(form.handle.data)
 
-            update_fields.append("DAILY_INSPIRATIONS = ?")
+            update_fields.append("DAILY_INSPIRATIONS = %s")
             params.append(int(form.daily_inspirations.data))
 
-            update_fields.append("SHOW_NOTIFICATIONS = ?")
+            update_fields.append("SHOW_NOTIFICATIONS = %s")
             params.append(int(form.show_notifications.data))
 
             # DODAJ AKTUALIZACJĘ DATY MODYFIKACJI
-            update_fields.append("MODIFIED_DATE = ?")
+            update_fields.append("MODIFIED_DATE = %s")
             params.append(datetime.now())
 
             # Jeśli użytkownik podał nowe hasło
             if form.new_password.data:
                 hashed_password = generate_password_hash(form.new_password.data)
-                update_fields.append("PASSWORD = ?")
+                update_fields.append("PASSWORD = %s")
                 params.append(hashed_password)
 
             params.append(current_user.id)
 
             # Wykonaj aktualizację
-            query = f"UPDATE USERS SET {', '.join(update_fields)} WHERE ID = ?"
+            query = f"UPDATE USERS SET {', '.join(update_fields)} WHERE ID = %s"
             cursor.execute(query, params)
 
             connection.commit()
@@ -1414,9 +1422,21 @@ def settings():
 
     return render_template('settings.html', form=form, user=current_user)
 
-# =============================================================================
+def close_connection():
+    """Zamyka połączenie z bazą danych"""
+    global connection, cursor
+    try:
+        if cursor:
+            cursor.close()
+        if connection:
+            connection.close()
+        print("Połączenie z bazą danych zamknięte")
+    except Exception as e:
+        print(f"Błąd przy zamykaniu: {e}")
+
+
+
 # URUCHOMIENIE APLIKACJI
-# =============================================================================
 
 if __name__ == '__main__':
     app.run(debug=True)
