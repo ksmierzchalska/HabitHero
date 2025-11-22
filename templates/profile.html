@@ -43,41 +43,6 @@ setTimeout(() => {
             <span class="progress-label">{{ percentage }}%</span>
         </div>
 
-        <!-- NAWIGACJA -->
-        <nav class="profile-nav">
-            <div class="nav-grid">
-                <a href="{{ url_for('challenges') }}" class="nav-card">
-                    <span class="nav-icon">🎯</span>
-                    <span class="nav-text">Wyzwania</span>
-                </a>
-                <a href="{{ url_for('ranking') }}" class="nav-card">
-                    <span class="nav-icon">🏆</span>
-                    <span class="nav-text">Ranking</span>
-                </a>
-                <a href="{{ url_for('history') }}" class="nav-card">
-                    <span class="nav-icon">📊</span>
-                    <span class="nav-text">Historia</span>
-                </a>
-                <a href="{{ url_for('habits') }}" class="nav-card">
-                    <span class="nav-icon">⚡</span>
-                    <span class="nav-text">Nawyki</span>
-                </a>
-                <a href="{{ url_for('dashboard') }}" class="nav-card">
-                    <span class="nav-icon">📈</span>
-                    <span class="nav-text">Dashboard</span>
-                </a>
-                <a href="{{ url_for('settings') }}" class="nav-card">
-                    <span class="nav-icon">⚙️</span>
-                    <span class="nav-text">Ustawienia</span>
-                </a>
-                {% if user.is_admin %}
-                <a href="{{ url_for('admin_panel') }}" class="nav-card nav-card--admin">
-                    <span class="nav-icon">🔧</span>
-                    <span class="nav-text">Panel Admina</span>
-                </a>
-                {% endif %}
-            </div>
-        </nav>
     </header>
 
     <!-- GŁÓWNA ZAWARTOŚĆ -->

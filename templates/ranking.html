@@ -65,22 +65,9 @@
             <div class="empty-icon">📝</div>
             <h3 class="empty-title">Brak użytkowników w rankingu</h3>
             <p class="empty-description">Dołącz do wyzwań i zdobądź pierwsze punkty rankingowe!</p>
-            <a href="{{ url_for('challenges') }}" class="empty-action btn btn--primary">
-                <span class="btn-icon" aria-hidden="true">🎯</span>
-                Przejdź do wyzwań
-            </a>
+        
         </div>
         {% endif %}
       </section>
-      <footer class="ranking-actions">
-        <a href="{{ url_for('challenges') }}" class="btn btn--outline">
-            <span class="btn-icon" aria-hidden="true">🏆</span>
-            Dołącz do wyzwań
-        </a>
-        <a href="{{ url_for('profile') }}" class="btn btn--primary">
-            <span class="btn-icon" aria-hidden="true">👤</span>
-            Powrót do profilu
-        </a>
-      </footer>
 </main>
 {% endblock %}

@@ -8,8 +8,74 @@
     {% block head %}{% endblock %}
 </head>
 <body>
+    {% if current_user.is_authenticated %}
+        <nav class="nav">
+            <div>
+                <ul>
+                    <li>
+                        <a href="{{ url_for('challenges') }}" class="nav-card">
+                            <span class="nav-icon">🎯</span>
+                            <span class="nav-text">Wyzwania</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ url_for('ranking') }}" class="nav-card">
+                            <span class="nav-icon">🏆</span>
+                            <span class="nav-text">Ranking</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ url_for('history') }}" class="nav-card">
+                            <span class="nav-icon">📊</span>
+                            <span class="nav-text">Historia</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ url_for('habits') }}" class="nav-card">
+                            <span class="nav-icon">⚡</span>
+                            <span class="nav-text">Nawyki</span>
+                        </a>
+                    </li>
+                    <li>
+                         <a href="{{ url_for('dashboard') }}" class="nav-card">
+                            <span class="nav-icon">📈</span>
+                            <span class="nav-text">Dashboard</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ url_for('settings') }}" class="nav-card">
+                            <span class="nav-icon">⚙️</span>
+                            <span class="nav-text">Ustawienia</span>
+                        </a>
+                    </li>
+                    <li>
+                        {% if user.is_admin %}
+                        <a href="{{ url_for('admin_panel') }}" class="nav-card nav-card--admin">
+                            <span class="nav-icon">🔧</span>
+                            <span class="nav-text">Panel Admina</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+    {% else %}
+        <nav class="nav-login">
+            <div>
+                <ul>
+                    <li>
+                        <a href="{{ url_for('registration') }}" class="btn-primary">Zacznij teraz - za darmo</a>
+                    </li>
+                    <li>
+                        <a href="{{ url_for('login') }}" class="btn-secondary">Mam już konto</a>
+                    </li>
+                </ul>
 
-    <!-- PRAWIDŁOWY WARUNEK DLA POWIADOMIEŃ -->
+            </div>
+        </nav>
+    {% endif %}
+
+
+    <!--  WARUNEK DLA POWIADOMIEŃ -->
     {% if current_user.is_authenticated %}
         {% set user_settings = get_user_settings(current_user.id) %}
         {% if user_settings and user_settings[1] == 1 %}  <!-- SHOW_NOTIFICATIONS = 1 -->
