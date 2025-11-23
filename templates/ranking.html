@@ -4,70 +4,71 @@
 
 {% block body %}
 <main class="ranking-page">
-    <header class="ranking-header">
-        <h1 class="ranking=title">
-            <span class="ranking-icon">🏆</span>
-            Ranking Top 10 
-        </h1>
-        <p class="ranking-subtitle">Najlepsi użytkownicy według punktów z <strong>wyzwań</strong></p>
-    </header>
-    <!-- Informacje o rankingu -->
-     <section class="ranking-info">
-        <div class="info-card">
-            <h2 class="info-title">
-                <span >
-                   📊Informacje o rankingu 
-                </span>
-            </h2>
-        </div>
-     </section>
-     <!-- Lista -->
-      <section class="ranking-section">
-        <h2 class="list-titte">Lista wyników</h2>
+    <div class="container">
+        <header class="ranking-header">
+            <h1 class="ranking=title">
+                <span class="ranking-icon">🏆</span>
+                Ranking Top 10
+            </h1>
+            <p class="subtitle">Najlepsi użytkownicy według punktów z <strong>wyzwań</strong></p>
+        </header>
+        <!-- Informacje o rankingu -->
+         <section class="ranking-info">
+            <div class="info-card">
+                <h2 class="info-title">
+                    <span >
+                       📊Informacje o rankingu
+                    </span>
+                </h2>
+            </div>
+         </section>
+         <!-- Lista -->
+          <section class="ranking-section">
+            <h2 class="list-titte">Lista wyników</h2>
 
-        {% if top_users %}
-        <div class="ranking-list">
-            {% for user in top_users %}
-            <article class="ranking-item 
-            {% if loop.index == 1 %}ranking-item--gold
-            {% elif loop.index == 2 %}ranking-item--silver
-            {% elif loop.index == 3 %}ranking-item--bronze
-            {% endif %}">
-                <div class="ranking-medal">
-                    {% if loop.index == 1 %}
-                    <span class="medal-icon">🥇 Złoty medal</span>
-                    {% elif loop.index == 2 %}
-                    <span class="medal-icon">🥈 Srebrny medal</span>
-                    {% elif loop.index == 3 %}
-                    <span class="medal-icon">🥉 Brązowy medal</span>
-                    {% else %}
-                    <span class="ranking-number">#{{ loop.index }}</span>
-                    {% endif %}
-                </div>
-                <div class="user-info">
-                    <h3 class="user-name">{{ user[0] }}</h3>
-                    <div class="user-details">
-                        <span class="user-level">Poziom {{ user[2] }}</span>
+            {% if top_users %}
+            <div class="ranking-list">
+                {% for user in top_users %}
+                <article class="ranking-item
+                {% if loop.index == 1 %}ranking-item--gold
+                {% elif loop.index == 2 %}ranking-item--silver
+                {% elif loop.index == 3 %}ranking-item--bronze
+                {% endif %}">
+                    <div class="ranking-medal">
+                        {% if loop.index == 1 %}
+                        <span class="medal-icon">🥇 Złoty medal</span>
+                        {% elif loop.index == 2 %}
+                        <span class="medal-icon">🥈 Srebrny medal</span>
+                        {% elif loop.index == 3 %}
+                        <span class="medal-icon">🥉 Brązowy medal</span>
+                        {% else %}
+                        <span class="ranking-number">#{{ loop.index }}</span>
+                        {% endif %}
                     </div>
-                </div>
-                <div class="user-stats">
-                    <div class="points-display">
-                        <span class="points-value">{{ user[1] }}</span>
-                        <span class="points-label">punktów</span>
+                    <div class="user-info">
+                        <h3 class="user-name">{{ user[0] }}</h3>
+                        <div class="user-details">
+                            <span class="user-level">Poziom {{ user[2] }}</span>
+                        </div>
                     </div>
-                    <span class="points-source">z wyzwań</span>
-                </div>
-            </article>
-            {% endfor %}
-        </div>
-        {% else %}
-        <div class="empty-ranking">
-            <div class="empty-icon">📝</div>
-            <h3 class="empty-title">Brak użytkowników w rankingu</h3>
-            <p class="empty-description">Dołącz do wyzwań i zdobądź pierwsze punkty rankingowe!</p>
-        
-        </div>
-        {% endif %}
-      </section>
+                    <div class="user-stats">
+                        <div class="points-display">
+                            <span class="points-value">{{ user[1] }}</span>
+                            <span class="points-label">punktów</span>
+                        </div>
+                        <span class="points-source">z wyzwań</span>
+                    </div>
+                </article>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="empty-ranking">
+                <div class="empty-icon">📝</div>
+                <h3 class="empty-title">Brak użytkowników w rankingu</h3>
+                <p class="empty-description">Dołącz do wyzwań i zdobądź pierwsze punkty rankingowe!</p>
+            </div>
+            {% endif %}
+          </section>
+    </div>
 </main>
 {% endblock %}

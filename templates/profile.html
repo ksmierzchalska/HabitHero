@@ -9,148 +9,159 @@
 <div class="badge-notification">
     <div class="badge-overlay"></div>
     <div class="badge-popup">
-        <h3>🎉 Nowa Odznaka! 🎉</h3>
-        <div class="badge-icon-large">🏅</div>
-        <h4>{{ badge.name }}</h4>
+        <h3>Nowa Odznaka!</h3>
+        <h2>{{ badge.name }}</h4>
         <p class="countdown">Powiadomienie zniknie za 5 sekund...</p>
     </div>
 </div>
-<!-- <script>
-setTimeout(() => {
-    window.location.href = "{{ url_for('profile', clear_notification='true') }}";
-}, 5000);
-</script> -->
+<script>
+    let button = document.getElementsByClassName('badge-overlay')[0];
+    let popup = document.getElementsByClassName('badge-notification')[0];
+    button.addEventListener('click', function() {
+        popup.classList.add('hidden');
+    });
+// setTimeout(() => {
+//     window.location.href = "{{ url_for('profile', clear_notification='true') }}";
+// }, 5000);
+</script>
 <meta http-equiv="refresh" content="5;url={{ url_for('profile', clear_notification='true') }}">
 {% endif %}
 
 <main class="profile-page">
+    <div class="container">
     <!-- NAGŁÓWEK PROFILU -->
-    <header class="profile-header">
-        <div class="profile-info">
-            <h1 class="profile-title">
-                <span class="profile-avatar">👤</span>
-                {{ user.handle }}
-            </h1>
-            <p class="profile-level">Poziom {{ user.display_level or 1 }}</p>
-        </div>
+    <div class="big-box box-blue">
+        <header class="profile-header">
 
-        <!-- PROGRES POZIOMU -->
-        {% set progress = current_user.level_progress or 0 %}
-        {% set maxp = current_user.level_max or 250 %}
-        {% set percentage = ((progress / maxp) * 100) | round | int %}
-        
-        <div class="progress-gradient" style="--progress: {{ percentage }}%">
-            <span class="progress-label">{{ percentage }}%</span>
-        </div>
+            <!-- PROGRES POZIOMU -->
+            {% set total = current_user.total_points or 0 %}
+            {% set progress = current_user.level_progress or 0 %}
+            {% set maxp = current_user.level_max or 250 %}
+            {% set percentage = ((progress / maxp) * 100) | round | int %}
+            <div class="profile-info">
+                <h1 class="profile-title">
+                    <span class="profile-avatar">👤</span>
+                    {{ user.handle }}
+                </h1>
+                <p class="profile-level">Poziom {{ user.display_level or 1 }} | {{ total }} / {{ total - progress + maxp }} doświadczenia</p>
+            </div>
 
-    </header>
 
+            <div class="progress-gradient">
+                <span class="progress-label">{{ percentage }}%</span>
+                <span class="progress-bar" style="width: {{ percentage }}%"></span>
+            </div>
+
+        </header>
+    </div>
     <!-- GŁÓWNA ZAWARTOŚĆ -->
     <div class="profile-content">
         <!-- LEWA KOLUMNA - CELE -->
-        <div class="content-column">
-            <section class="goals-section">
-                <header class="section-header">
-                    <h2 class="section-title">
-                        <span class="section-icon">🎯</span>
-                        Twoje cele
-                    </h2>
-                </header>
+        <div class="big-box box-yellow">
+            <div class="content-column">
+                <section class="goals-section">
+                    <header class="section-header">
+                        <h2 class="section-title">
+                            <span class="section-icon">🎯</span>
+                            Twoje cele
+                        </h2>
+                    </header>
 
-                <!-- FORMULARZ DODAWANIA CELU -->
-                <article class="add-goal-card">
-                    <h3 class="card-title">Dodaj nowy cel</h3>
-                    <form method="POST" action="{{ url_for('add_main_goal') }}" class="goal-form">
-                        {{ add_form.hidden_tag() }}
-                        <div class="form-row">
-                            <div class="form-group">
-                                {{ add_form.name.label(class="form-label") }}
-                                {{ add_form.name(class="form-input", placeholder="np. Codzienny jogging przez 30 dni") }}
-                                <div class="form-help">Opisz swój cel w kilku słowach</div>
+                    <!-- FORMULARZ DODAWANIA CELU -->
+                    <article class="add-goal-card">
+                        <h3 class="card-title">Dodaj nowy cel</h3>
+                        <form method="POST" action="{{ url_for('add_main_goal') }}" class="goal-form">
+                            {{ add_form.hidden_tag() }}
+                            <div class="form-row">
+                                <div class="form-group">
+                                    {{ add_form.name.label(class="form-label") }}
+                                    {{ add_form.name(class="form-input", placeholder="np. Codzienny jogging przez 30 dni") }}
+                                    <div class="form-help">Opisz swój cel w kilku słowach</div>
+                                </div>
+                                <div class="form-group">
+                                    {{ add_form.duration_days.label(class="form-label") }}
+                                    {{ add_form.duration_days(class="form-input", placeholder="30") }}
+                                    <div class="form-help">Liczba dni</div>
+                                </div>
                             </div>
-                            <div class="form-group">
-                                {{ add_form.duration_days.label(class="form-label") }}
-                                {{ add_form.duration_days(class="form-input", placeholder="30") }}
-                                <div class="form-help">Liczba dni</div>
-                            </div>
+                            {{ add_form.submit(class="btn btn--primary btn--full") }}
+                        </form>
+                    </article>
+
+                    <!-- LISTA AKTYWNYCH CELÓW -->
+                    <div class="goals-list">
+                        {% if goals %}
+                            {% for goal in goals %}
+                                {% if request.args.get('edit') == goal.id|string %}
+                                <!-- FORMULARZ EDYCJI -->
+                                <article class="goal-card goal-card--editing">
+                                    <h3 class="card-title">Edytuj cel</h3>
+                                    <form method="POST" action="{{ url_for('update_goal') }}" class="goal-form">
+                                        {{ edit_form.hidden_tag() }}
+                                        <input type="hidden" name="goal_id" value="{{ goal.id }}">
+                                        <div class="form-row">
+                                            <div class="form-group">
+                                                {{ edit_form.name.label(class="form-label") }}
+                                                {{ edit_form.name(class="form-input", value=goal.name) }}
+                                            </div>
+                                            <div class="form-group">
+                                                {{ edit_form.duration_days.label(class="form-label") }}
+                                                {{ edit_form.duration_days(class="form-input", value=goal.duration_days) }}
+                                            </div>
+                                        </div>
+                                        <div class="form-actions">
+                                            {{ edit_form.submit(class="btn btn--primary") }}
+                                            <a href="{{ url_for('profile') }}" class="btn btn--secondary">Anuluj</a>
+                                        </div>
+                                    </form>
+                                </article>
+                                {% else %}
+                                <!-- KARTA CELU -->
+                                <article class="goal-card">
+                                    <header class="goal-header">
+                                        <h3 class="goal-title">{{ goal.name }}</h3>
+                                        <div class="goal-meta">
+                                            <span class="goal-duration">{{ goal.duration_days }} dni</span>
+                                            <span class="goal-created">Utworzono: {{ goal.created.strftime('%d.%m.%Y') }}</span>
+                                        </div>
+                                    </header>
+                                    <footer class="goal-actions">
+                                        <a href="?edit={{ goal.id }}" class="btn btn--outline">
+                                            <span class="btn-icon">✏️</span>
+                                            Edytuj
+                                        </a>
+                                        <form method="POST" action="{{ url_for('complete_goal', goal_id=goal.id) }}" class="action-form">
+                                            <button type="submit" class="btn btn--success">
+                                                <span class="btn-icon">✅</span>
+                                                Zakończ
+                                            </button>
+                                        </form>
+                                        <form method="POST" action="{{ url_for('delete_goal', goal_id=goal.id) }}" class="action-form">
+                                            <button type="submit" class="btn btn--danger"
+                                                    data-goal-name="{{ goal.name }}"
+                                                    onclick="return confirmDelete(this)">
+                                                <span class="btn-icon">🗑️</span>
+                                                Usuń
+                                            </button>
+                                        </form>
+                                    </footer>
+                                </article>
+                                {% endif %}
+                            {% endfor %}
+                        {% else %}
+                        <div class="empty-state">
+                            <div class="empty-state__icon">🎯</div>
+                            <h3 class="empty-state__title">Brak aktywnych celów</h3>
+                            <p class="empty-state__description">Dodaj swój pierwszy cel, aby rozpocząć podróż!</p>
                         </div>
-                        {{ add_form.submit(class="btn btn--primary btn--full") }}
-                    </form>
-                </article>
-
-                <!-- LISTA AKTYWNYCH CELÓW -->
-                <div class="goals-list">
-                    {% if goals %}
-                        {% for goal in goals %}
-                            {% if request.args.get('edit') == goal.id|string %}
-                            <!-- FORMULARZ EDYCJI -->
-                            <article class="goal-card goal-card--editing">
-                                <h3 class="card-title">Edytuj cel</h3>
-                                <form method="POST" action="{{ url_for('update_goal') }}" class="goal-form">
-                                    {{ edit_form.hidden_tag() }}
-                                    <input type="hidden" name="goal_id" value="{{ goal.id }}">
-                                    <div class="form-row">
-                                        <div class="form-group">
-                                            {{ edit_form.name.label(class="form-label") }}
-                                            {{ edit_form.name(class="form-input", value=goal.name) }}
-                                        </div>
-                                        <div class="form-group">
-                                            {{ edit_form.duration_days.label(class="form-label") }}
-                                            {{ edit_form.duration_days(class="form-input", value=goal.duration_days) }}
-                                        </div>
-                                    </div>
-                                    <div class="form-actions">
-                                        {{ edit_form.submit(class="btn btn--primary") }}
-                                        <a href="{{ url_for('profile') }}" class="btn btn--secondary">Anuluj</a>
-                                    </div>
-                                </form>
-                            </article>
-                            {% else %}
-                            <!-- KARTA CELU -->
-                            <article class="goal-card">
-                                <header class="goal-header">
-                                    <h3 class="goal-title">{{ goal.name }}</h3>
-                                    <div class="goal-meta">
-                                        <span class="goal-duration">{{ goal.duration_days }} dni</span>
-                                        <span class="goal-created">Utworzono: {{ goal.created.strftime('%d.%m.%Y') }}</span>
-                                    </div>
-                                </header>
-                                <footer class="goal-actions">
-                                    <a href="?edit={{ goal.id }}" class="btn btn--outline">
-                                        <span class="btn-icon">✏️</span>
-                                        Edytuj
-                                    </a>
-                                    <form method="POST" action="{{ url_for('complete_goal', goal_id=goal.id) }}" class="action-form">
-                                        <button type="submit" class="btn btn--success">
-                                            <span class="btn-icon">✅</span>
-                                            Zakończ
-                                        </button>
-                                    </form>
-                                    <form method="POST" action="{{ url_for('delete_goal', goal_id=goal.id) }}" class="action-form">
-                                        <button type="submit" class="btn btn--danger" 
-                                                data-goal-name="{{ goal.name }}"
-                                                onclick="return confirmDelete(this)">
-                                            <span class="btn-icon">🗑️</span>
-                                            Usuń
-                                        </button>
-                                    </form>
-                                </footer>
-                            </article>
-                            {% endif %}
-                        {% endfor %}
-                    {% else %}
-                    <div class="empty-state">
-                        <div class="empty-state__icon">🎯</div>
-                        <h3 class="empty-state__title">Brak aktywnych celów</h3>
-                        <p class="empty-state__description">Dodaj swój pierwszy cel, aby rozpocząć podróż!</p>
+                        {% endif %}
                     </div>
-                    {% endif %}
-                </div>
-            </section>
+                </section>
+            </div>
         </div>
 
         <!-- PRAWA KOLUMNA - WYZWANIA I ODZNAKI -->
-        <div class="content-column">
+        <div class="big-box box-red">
             <!-- WYZWANIA -->
             <section class="challenges-section">
                 <header class="section-header">
@@ -209,7 +220,8 @@ setTimeout(() => {
                 </div>
                 {% endif %}
             </section>
-
+        </div>
+        <div class="big-box box-purple">
             <!-- ODZNAKI -->
             <section class="badges-section">
                 <header class="section-header">
@@ -244,6 +256,7 @@ setTimeout(() => {
                 {% endif %}
             </section>
         </div>
+    </div>
     </div>
 </main>
 {% endblock %}

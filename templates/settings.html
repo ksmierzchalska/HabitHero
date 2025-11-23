@@ -3,30 +3,30 @@
 {% block title %}Ustawienia - HabitHero{% endblock %}
 
 {% block body %}
-<div class="settings-container">
+<div class="container">
     <div class="settings-header">
-        <h1>⚙️ Ustawienia konta</h1>
-        <p>Dostosuj aplikację do swoich preferencji</p>
+        <h1>Ustawienia konta</h1>
+        <p class="subtitle">Dostosuj aplikację do swoich preferencji</p>
     </div>
 
-    
-    
+
+
     <div class="settings-content">
         <!-- Formularz ustawień -->
         <div class="settings-card">
             <h2>Personalizacja</h2>
             <form method="POST" action="{{ url_for('settings') }}">
                 {{ form.hidden_tag() }}
-                
+
                 <div class="settings-group">
                     <h3>Preferencje</h3>
-                    
+
                     <div class="setting-item">
                         {{ form.daily_inspirations() }}
                         {{ form.daily_inspirations.label }}
                         <span class="setting-description">Codzienne inspiracje i motywacyjne cytaty w sekcji nawyków</span>
                     </div>
-                    
+
                     <div class="setting-item">
                         {{ form.show_notifications() }}
                         {{ form.show_notifications.label }}
@@ -36,22 +36,22 @@
 
                 <div class="settings-group">
                     <h3>Dane konta</h3>
-                    
-                    <div class="setting-item">
-                        {{ form.handle.label }}
-                        {{ form.handle() }}
-                        <span class="setting-description">Twoja publiczna nazwa wyświetlana w aplikacji</span>
+
+                    <div class="form-group">
+                        {{ form.handle.label(class="form-label") }}
+                        {{ form.handle(class="form-input", placeholder="Wpisz nazwe") }}
+
                     </div>
-                    
-                    <div class="setting-item">
-                        {{ form.new_password.label }}
-                        {{ form.new_password(placeholder="Zostaw puste jeśli nie chcesz zmieniać") }}
-                        <span class="setting-description">Minimum 6 znaków</span>
+
+                    <div class="form-group">
+                        {{ form.new_password.label(class="form-label") }}
+                        {{ form.new_password(class="form-input", placeholder="Zostaw puste jeśli nie chcesz zmieniać") }}
+
                     </div>
-                    
-                    <div class="setting-item">
-                        {{ form.confirm_password.label }}
-                        {{ form.confirm_password(placeholder="Powtórz nowe hasło") }}
+
+                    <div class="form-group">
+                        {{ form.confirm_password.label(class="form-label") }}
+                        {{ form.confirm_password(class="form-input", placeholder="Powtórz nowe hasło") }}
                     </div>
                 </div>
 

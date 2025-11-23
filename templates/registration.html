@@ -1,14 +1,14 @@
-{% extends 'base.html' %} 
+{% extends 'base.html' %}
 
 {% block head %}
 
 {% endblock %}
 
 {% block body %}
-<div class="registration_container">
+<div class="container">
     <div class="registration-header">
         <h1>Rejestracja</h1>
-        <p>Stwórz nowe konto</p>
+        <p class="subtitle">Stwórz nowe konto</p>
     </div>
     <div class="flash=messages">
         {% with messages = get_flashed_messages(with_categories=true) %}
@@ -23,14 +23,14 @@
     </div>
     <form method="POST">
         {{ form.hidden_tag() }}
-    
+
         <!-- Imie -->
      <div class="form-group">
         <label class="form-label" for="firstname">Imię</label>
-        <input type="text" 
-                 class="form-input" 
-                id="firstname" 
-                name="firstname" 
+        <input type="text"
+                 class="form-input"
+                id="firstname"
+                name="firstname"
                 placeholder="Wpisz imię"
                 value="{{ form.firstname.data if form.firstname.data }}">
         {% if form.firstname.errors %}
@@ -42,10 +42,10 @@
        <!-- Nazwisko -->
        <div class="form-group">
         <label class="form-label" for="lastname">Nazwisko</label>
-        <input type="text" 
-                 class="form-input" 
-                id="lastname" 
-                name="lastname" 
+        <input type="text"
+                 class="form-input"
+                id="lastname"
+                name="lastname"
                 placeholder="Wpisz nazwisko"
                 value="{{ form.lastname.data if form.lastname.data }}">
         {% if form.lastname.errors %}
@@ -58,10 +58,10 @@
        <!-- Nazwa użytkownika -->
        <div class="form-group">
         <label class="form-label" for="handle">Nazwa użytkownika</label>
-        <input type="text" 
-                 class="form-input" 
-                id="handle" 
-                name="handle" 
+        <input type="text"
+                 class="form-input"
+                id="handle"
+                name="handle"
                 placeholder="Wpisz nazwę użytkownika"
                 value="{{ form.handle.data if form.handle.data }}">
         {% if form.handle.errors %}
@@ -74,10 +74,10 @@
        <!-- Email -->
        <div class="form-group">
         <label class="form-label" for="email">Email</label>
-        <input type="text" 
-                 class="form-input" 
-                id="email" 
-                name="email" 
+        <input type="text"
+                 class="form-input"
+                id="email"
+                name="email"
                 placeholder="twój@email.com"
                 value="{{ form.email.data if form.email.data }}">
         {% if form.email.errors %}
@@ -90,10 +90,10 @@
        <!-- hasło -->
        <div class="form-group">
         <label class="form-label" for="password">Hasło</label>
-        <input type="password" 
-                 class="form-input" 
-                id="password" 
-                name="password" 
+        <input type="password"
+                 class="form-input"
+                id="password"
+                name="password"
                 placeholder="Minimum 6 znaków"
                 value="{{ form.password.data if form.password.data }}">
         {% if form.password.errors %}
@@ -106,10 +106,10 @@
        <!-- powtórz hasło -->
        <div class="form-group">
         <label class="form-label" for="password_check">Powtórz hasło</label>
-        <input type="password" 
-                 class="form-input" 
-                id="password_check" 
-                name="password_check" 
+        <input type="password"
+                 class="form-input"
+                id="password_check"
+                name="password_check"
                 placeholder="Powtórz hasło"
                 value="{{ form.password_check.data if form.password_check.data }}">
         {% if form.password_check.errors %}
@@ -120,7 +120,7 @@
        </div>
 
        <!-- przycisk -->
-       {{ form.submit(class="submit-btn") }}
+       {{ form.submit(class="btn") }}
 
     </form>
     <div class="login-link">

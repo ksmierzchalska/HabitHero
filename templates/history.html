@@ -2,9 +2,10 @@
 
 {% block body %}
 <div class="history-page">
-    <div class="history-header">
-        <h1>📊 Twoja historia</h1>
-        <p>Przeglądaj ukończone cele, wyzwania oraz nieaktywne nawyki</p>
+    <div class="container">
+        <div class="history-header">
+        <h1>Twoja historia</h1>
+        <p class="subtitle">Przeglądaj ukończone cele, wyzwania oraz nieaktywne nawyki</p>
     </div>
     <div class="filters">
         <strong>Pokaż:</strong>
@@ -13,11 +14,11 @@
         <a href="?filter=challenges" class="filter-btn {% if filter_type == 'challenges' %}active{% endif %}">Wyzwania</a>
         <a href="?filter=habits" class="filter-btn {% if filter_type == 'habits' %}active{% endif %}">Nawyki</a>
     </div>
-    
+
 <!-- Cele główne -->
     {% if filter_type in ['all', 'goals'] and completed_goals %}
     <section class="history-section">
-        <h2>🎯 Ukończone cele ({{ completed_goals|length }})</h2>
+        <h2>Ukończone cele ({{ completed_goals|length }})</h2>
         {% for goal in completed_goals %}
         <div class="item-card">
             <h3>{{ goal[1] }}</h3>
@@ -64,17 +65,17 @@
                     <form method="POST" action="{{ url_for('activate_habit', habit_id=habit[0]) }}">
                         <button type="submit" class="btn-activate">▶️ Aktywuj</button>
                     </form>
-                    <form method="POST" action="{{ url_for('delete_habit_permanently', habit_id=habit[0]) }}" 
+                    <form method="POST" action="{{ url_for('delete_habit_permanently', habit_id=habit[0]) }}"
                           onsubmit="return confirm('Na pewno usunąć ten nawyk?')">
                         <button type="submit" class="btn-delete">🗑️ Usuń</button>
                     </form>
                 </div>
             </div>
-            
+
             {% if habit[2] %}
             <p class="habit-desc">{{ habit[2] }}</p>
             {% endif %}
-            
+
             <div class="item-details">
                 <span>Cel: {{ habit[3] }} {{ habit[5] or '' }}</span>
                 <span>Ostatnia passa: {{ habit[8] }} dni</span>
@@ -87,7 +88,7 @@
     {% endif %}
 
     <!-- Brak wyników -->
-    {% if (filter_type == 'all' and not completed_goals and not completed_challenges and not inactive_habits) or 
+    {% if (filter_type == 'all' and not completed_goals and not completed_challenges and not inactive_habits) or
           (filter_type == 'goals' and not completed_goals) or
           (filter_type == 'challenges' and not completed_challenges) or
           (filter_type == 'habits' and not inactive_habits) %}
@@ -96,8 +97,11 @@
     </div>
     {% endif %}
 
-  
-    
+
+    </div>
+
+
+
 </div>
 
 {% endblock %}

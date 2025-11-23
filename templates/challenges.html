@@ -4,59 +4,64 @@
 {% endblock %}
 
 {% block body %}
-<h1>Wyzwania</h1>
+<div class="challenges-page">
+    <div class="container">
+        <h1>Wyzwania</h1>
+        <!-- DODANY FORMULARZ FILTROWANIA -->
+        <div class="filter-section">
+            <form method="GET" action="{{ url_for('challenges') }}" class="filter-form">
+                <label class="filter-label">
+                    Filtruj po poziomie:
+                </label>
+                <select name="level" class="filter-select">
+                    <option value="all" {% if selected_level == 'all' %}selected{% endif %}>Wszystkie poziomy</option>
+                    <option value="niski" {% if selected_level == 'niski' %}selected{% endif %}>Niski</option>
+                    <option value="średni" {% if selected_level == 'średni' %}selected{% endif %}>Średni</option>
+                    <option value="wysoki" {% if selected_level == 'wysoki' %}selected{% endif %}>Wysoki</option>
+                </select><br/>
+                <button type="submit" class="btn btn--filter">Filtruj</button>
 
-<!-- DODANY FORMULARZ FILTROWANIA -->
-<div class="filter-section">
-    <form method="GET" action="{{ url_for('challenges') }}" class="filter-form">
-        <label class="filter-label">
-            <strong>Filtruj po poziomie:</strong>
-        </label>
-        <select name="level" class="filter-select">
-            <option value="all" {% if selected_level == 'all' %}selected{% endif %}>Wszystkie poziomy</option>
-            <option value="niski" {% if selected_level == 'niski' %}selected{% endif %}>Niski</option>
-            <option value="średni" {% if selected_level == 'średni' %}selected{% endif %}>Średni</option>
-            <option value="wysoki" {% if selected_level == 'wysoki' %}selected{% endif %}>Wysoki</option>
-        </select>
-        <button type="submit" class="btn btn--filter">Filtruj</button>
-        
-        {% if selected_level != 'all' %}
-        <a href="{{ url_for('challenges') }}" class="clear-filter">Wyczyść filtr</a>
-        {% endif %}
-    </form>
+                {% if selected_level != 'all' %}
+                <br/><a href="{{ url_for('challenges') }}" class="clear-filter">Wyczyść filtr</a>
+                {% endif %}
+            </form>
+        </div>
+        {% for section_name, section_challenges in challenges.items() %}
+        <section class="challenge-section">
+            <div class="challenge-container">
+                <h2>{{ section_name }}</h2>
+                <table border="1" cellpadding="5" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>Nazwa wyzwania</th>
+                            <th>Czas trwania</th>
+                            <th>Poziom</th>
+                            <th>XP do zdobycia</th>
+                            <th>Akcja</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for challenge in section_challenges %}
+                        <tr>
+                            <td>{{ challenge.name }}</td>
+                            <td>{{ challenge.duration_days }} dni</td>
+                            <td>{{ challenge.level }}</td>
+                            <td>{{ challenge.xp }}</td>
+                            <td>
+                                <form method="POST" action="{{ url_for('join_challenge', challenge_id=challenge.id) }}">
+                                    <button type="submit" class="join-btn">Dołącz</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+        {% endfor %}
+    </div>
 </div>
 
 
-{% for section_name, section_challenges in challenges.items() %}
-<section class="challenge-section">
-    <h2>{{ section_name }}</h2>
-    <table border="1" cellpadding="5" cellspacing="0">
-        <thead>
-            <tr>
-                <th>Nazwa wyzwania</th>
-                <th>Czas trwania</th>
-                <th>Poziom</th>
-                <th>XP do zdobycia</th>
-                <th>Akcja</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for challenge in section_challenges %}
-            <tr>
-                <td>{{ challenge.name }}</td>
-                <td>{{ challenge.duration_days }} dni</td>
-                <td>{{ challenge.level }}</td>
-                <td>{{ challenge.xp }}</td>
-                <td>
-                    <form method="POST" action="{{ url_for('join_challenge', challenge_id=challenge.id) }}">
-                        <button type="submit">Dołącz</button>
-                    </form>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-</section>
-<br>
-{% endfor %}
+
 {% endblock %}

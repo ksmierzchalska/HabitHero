@@ -3,433 +3,128 @@
 {% block body %}
 
 
-<div class="dashboard">
-    <!-- Nagłówek -->
-    <div class="header">
-        <h1>Dashboard</h1>
-    </div>
+<div class="dashboard-page">
+    <div class="container">
+        <!-- Nagłówek -->
+        <div class="header">
+            <h1>Dashboard</h1>
+        </div>
 
-    <!-- Szybkie statystyki -->
-    <div class="stats-grid">
-        <div class="stat-card">
-            <div class="stat-number">{{ habit_stats|length }}</div>
-            <div class="stat-label">Aktywne nawyki</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-number">{{ habit_stats|map(attribute="3")|max if habit_stats else 0 }}</div>
-            <div class="stat-label">Najlepsza passa</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-number">{{ current_user.total_points or 0 }}</div>
-            <div class="stat-label">Łączne punkty</div>
-        </div>
-    </div>
-
-    <!-- Progres tygodniowy -->
-    <div class="section">
-        <h2>Progres z ostatnich 7 dni</h2>
-        {% if weekly_progress %}
-            <div class="table-container">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Data</th>
-                            <th>Wykonane nawyki</th>
-                            <th>Cele osiągnięte</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for progress in weekly_progress %}
-                        <tr>
-                            <td>{{ progress[0] }}</td>
-                            <td>{{ progress[1] }}</td>
-                            <td>{{ progress[2] }}</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+        <!-- Szybkie statystyki -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number">{{ habit_stats|length }}</div>
+                <div class="stat-label">Aktywne nawyki</div>
             </div>
-        {% else %}
-            <p class="no-data">Brak danych z ostatnich 7 dni</p>
-        {% endif %}
-    </div>
-
-    <!-- Twoja passa -->
-    <div class="section">
-        <h2>Twoja aktualna passa</h2>
-        <div class="streak-display">
-            {% for day in streak_history %}
-            <div class="day {% if day.completed %}completed{% elif day.is_today %}today{% else %}missed{% endif %}" 
-                 title="{{ day.date }} - {{ day.day_name }}">
-                {{ day.day_label }}
+            <div class="stat-card">
+                <div class="stat-number">{{ habit_stats|map(attribute="3")|max if habit_stats else 0 }}</div>
+                <div class="stat-label">Najlepsza passa</div>
             </div>
-            {% endfor %}
+            <div class="stat-card">
+                <div class="stat-number">{{ current_user.total_points or 0 }}</div>
+                <div class="stat-label">Łączne punkty</div>
+            </div>
         </div>
-        <div class="streak-info">
-            {% if current_streak > 0 %}
-                🔥 Passa: <strong>{{ current_streak }} dni</strong> z rzędu!
+
+        <!-- Progres tygodniowy -->
+        <div class="section">
+            <h2>Progres z ostatnich 7 dni</h2>
+            {% if weekly_progress %}
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Data</th>
+                                <th>Wykonane nawyki</th>
+                                <th>Cele osiągnięte</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for progress in weekly_progress %}
+                            <tr>
+                                <td>{{ progress[0] }}</td>
+                                <td>{{ progress[1] }}</td>
+                                <td>{{ progress[2] }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
             {% else %}
-                💪 Zacznij nową passę już dziś!
+                <p class="no-data">Brak danych z ostatnich 7 dni</p>
+            {% endif %}
+        </div>
+
+        <!-- Twoja passa -->
+        <div class="section">
+            <h2>Twoja aktualna passa</h2>
+            <div class="streak-display">
+                {% for day in streak_history %}
+                <div class="day {% if day.completed %}completed{% elif day.is_today %}today{% else %}missed{% endif %}"
+                     title="{{ day.date }} - {{ day.day_name }}">
+                    {{ day.day_label }}
+                </div>
+                {% endfor %}
+            </div>
+            <div class="streak-info">
+                {% if current_streak > 0 %}
+                    🔥 Passa: <strong>{{ current_streak }} dni</strong> z rzędu!
+                {% else %}
+                    💪 Zacznij nową passę już dziś!
+                {% endif %}
+            </div>
+        </div>
+        <!-- Skuteczność według kategorii -->
+
+
+        <!-- Statystyki nawyków -->
+        <div class="section">
+            <h2>Twoje nawyki</h2>
+            {% if habit_stats %}
+                <div class="habits-list">
+                    {% for stat in habit_stats %}
+                    <div class="habit-item">
+                        <div class="habit-name">{{ stat[0] }}</div>
+                        <div class="habit-details">
+                            <span>Wykonane: {{ stat[1] }} dni</span>
+                            <span>Aktualna passa: {{ stat[3] }} dni</span>
+                            <span>Najlepsza passa: {{ stat[5] }} dni</span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="no-data">Brak aktywnych nawyków. Dodaj pierwszy nawyk!</p>
+            {% endif %}
+        </div>
+
+        <!-- ODZNAKI ZA PASSY - POPRAWIONE -->
+        <div class="section">
+            <h2>🏆 Twoje odznaki za passy</h2>
+            {% set user_streak_badges = [] %}
+            {% for badge in user_badges if badge[3] == 'streak' %}
+                {% set _ = user_streak_badges.append(badge) %}
+            {% endfor %}
+
+            {% if user_streak_badges %}
+                <div class="badges-container">
+                    {% for badge in user_streak_badges %}
+                    <div class="badge-item">
+                        <div class="badge-icon">🔥</div>
+                        <div class="badge-details">
+                                <strong>{{ badge[1] }}</strong>
+                                <p>{{ badge[2] }}</p>
+                                <small>Zdobyto: {{ badge[4].strftime('%d.%m.%Y') }}</small>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="no-data">Jeszcze nie zdobyłeś odznak za passy! Utrzymuj passę aby zdobyć odznaki.</p>
             {% endif %}
         </div>
     </div>
-    <!-- Skuteczność według kategorii -->
+</div>
 
 
-    <!-- Statystyki nawyków -->
-    <div class="section">
-        <h2>Twoje nawyki</h2>
-        {% if habit_stats %}
-            <div class="habits-list">
-                {% for stat in habit_stats %}
-                <div class="habit-item">
-                    <div class="habit-name">{{ stat[0] }}</div>
-                    <div class="habit-details">
-                        <span>Wykonane: {{ stat[1] }} dni</span>
-                        <span>Aktualna passa: {{ stat[3] }} dni</span>
-                        <span>Najlepsza passa: {{ stat[5] }} dni</span>
-                    </div>
-                </div>
-                {% endfor %}
-            </div>
-        {% else %}
-            <p class="no-data">Brak aktywnych nawyków. Dodaj pierwszy nawyk!</p>
-        {% endif %}
-    </div>
-
-    <!-- ODZNAKI ZA PASSY - POPRAWIONE -->
-    <div class="section">
-        <h2>🏆 Twoje odznaki za passy</h2>
-        {% set user_streak_badges = [] %}
-        {% for badge in user_badges if badge[3] == 'streak' %}
-            {% set _ = user_streak_badges.append(badge) %}
-        {% endfor %}
-        
-        {% if user_streak_badges %}
-            <div class="badges-container">
-                {% for badge in user_streak_badges %}
-                <div class="badge-item">
-                    <div class="badge-icon">🔥</div>
-                    <div class="badge-details">
-                        <strong>{{ badge[1] }}</strong>
-                        <p>{{ badge[2] }}</p>
-                        <small>Zdobyto: {{ badge[4].strftime('%d.%m.%Y') }}</small>
-                    </div>
-                </div>
-                {% endfor %}
-            </div>
-        {% else %}
-            <p class="no-data">Jeszcze nie zdobyłeś odznak za passy! Utrzymuj passę aby zdobyć odznaki.</p>
-        {% endif %}
-    </div>
-
-<!-- <style>
-.dashboard {
-    max-width: 1000px;
-    margin: 0 auto;
-    padding: 20px;
-}
-
-.header {
-    text-align: center;
-    margin-bottom: 30px;
-}
-
-.header h1 {
-    color: #333;
-    margin: 0;
-}
-
-/* Statystyki */
-.stats-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 15px;
-    margin-bottom: 30px;
-}
-
-.stat-card {
-    background: white;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    text-align: center;
-}
-
-.stat-number {
-    font-size: 2em;
-    font-weight: bold;
-    color: #3B82F6;
-    margin-bottom: 5px;
-}
-
-.stat-label {
-    color: #666;
-    font-size: 0.9em;
-}
-
-/* Szybkie akcje */
-.quick-actions {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 30px;
-    justify-content: center;
-}
-
-.action-btn {
-    background: #3B82F6;
-    color: white;
-    padding: 10px 20px;
-    text-decoration: none;
-    border-radius: 5px;
-    transition: background 0.3s;
-}
-
-.action-btn:hover {
-    background: #2563EB;
-}
-
-/* Sekcje */
-.section {
-    background: white;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    margin-bottom: 20px;
-}
-
-.section h2 {
-    margin-top: 0;
-    color: #333;
-    border-bottom: 2px solid #3B82F6;
-    padding-bottom: 10px;
-}
-
-/* Tabela */
-.table-container {
-    overflow-x: auto;
-}
-
-table {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-th, td {
-    padding: 12px;
-    text-align: left;
-    border-bottom: 1px solid #ddd;
-}
-
-th {
-    background: #f8f9fa;
-    font-weight: bold;
-}
-
-/* Passa */
-.streak-display {
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-    margin: 20px 0;
-}
-
-.day {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: bold;
-}
-
-.day.completed {
-    background: #10B981;
-    color: white;
-}
-
-.day.today {
-    background: #F59E0B;
-    color: white;
-}
-
-.day.missed {
-    background: #EF4444;
-    color: white;
-}
-
-.streak-info {
-    text-align: center;
-    font-size: 1.2em;
-    margin-top: 15px;
-}
-
-/* Lista nawyków */
-.habits-list {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-.habit-item {
-    padding: 15px;
-    border: 1px solid #E5E7EB;
-    border-radius: 5px;
-}
-
-.habit-name {
-    font-weight: bold;
-    margin-bottom: 5px;
-    font-size: 1.1em;
-}
-
-.habit-details {
-    display: flex;
-    gap: 20px;
-    color: #666;
-    font-size: 0.9em;
-}
-
-/* ODZNAKI - DODANE */
-.badges-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 15px;
-    margin-top: 15px;
-}
-
-.badge-item {
-    display: flex;
-    align-items: center;
-    padding: 15px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    border-radius: 10px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-.badge-icon {
-    font-size: 2.5em;
-    margin-right: 15px;
-}
-
-.badge-details {
-    flex: 1;
-}
-
-.badge-details strong {
-    display: block;
-    margin-bottom: 5px;
-    font-size: 1.1em;
-}
-
-.badge-details p {
-    margin: 5px 0;
-    opacity: 0.9;
-    font-size: 0.9em;
-}
-
-.badge-details small {
-    opacity: 0.8;
-    font-size: 0.8em;
-}
-
-/* POWIADOMIENIA - DODANE */
-.badge-notification {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 1000;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.badge-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.7);
-}
-
-.badge-popup {
-    position: relative;
-    background: white;
-    padding: 30px;
-    border-radius: 15px;
-    text-align: center;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-    max-width: 400px;
-    width: 90%;
-    z-index: 1001;
-}
-
-.badge-icon-large {
-    font-size: 4em;
-    margin: 15px 0;
-}
-
-.badge-popup h3 {
-    color: #3B82F6;
-    margin-bottom: 15px;
-}
-
-.badge-popup h4 {
-    color: #1F2937;
-    margin: 10px 0;
-}
-
-.badge-popup p {
-    color: #6B7280;
-    margin: 5px 0;
-}
-
-.points {
-    color: #10B981;
-    font-weight: bold;
-}
-
-.countdown {
-    font-size: 0.8em;
-    color: #9CA3AF;
-    margin-top: 15px;
-}
-
-/* Brak danych */
-.no-data {
-    text-align: center;
-    color: #6B7280;
-    font-style: italic;
-    padding: 20px;
-}
-
-/* Responsywność */
-@media (max-width: 768px) {
-    .stats-grid {
-        grid-template-columns: 1fr;
-    }
-    
-    .quick-actions {
-        flex-direction: column;
-    }
-    
-    .streak-display {
-        flex-wrap: wrap;
-    }
-    
-    .habit-details {
-        flex-direction: column;
-        gap: 5px;
-    }
-    
-    .badges-container {
-        grid-template-columns: 1fr;
-    }
-}
-</style> -->
 {% endblock %}
