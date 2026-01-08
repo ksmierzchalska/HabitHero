@@ -101,7 +101,7 @@ class HabitForm(FlaskForm):
     name = StringField("Nazwa nawyku", validators=[InputRequired()])
     description = StringField("Opis (opcjonalnie)")
     target_value = IntegerField("Cel dzienny", validators=[InputRequired(), NumberRange(min=1)])
-    unit = StringField("Jednostka (np. szklanki, minuty, km)")
+    unit = StringField("Jednostka (np. szklanki)")
     category = SelectField("Kategoria", choices=[
         ('health', 'Zdrowie'),
         ('fitness', 'Fitness'),
@@ -114,7 +114,7 @@ class HabitForm(FlaskForm):
 
 class HabitProgressForm(FlaskForm):
     value_achieved = IntegerField("Ilość wykonana", validators=[InputRequired(), NumberRange(min=0)])
-    submit = SubmitField("Zapisz progres")
+    submit = SubmitField("Zapisz")
 
 class UserSettingsForm(FlaskForm):
     daily_inspirations = BooleanField("Codzienne inspiracje motywacyjne")
@@ -342,7 +342,7 @@ def get_daily_inspiration():
     """Zwraca losową inspirację motywacyjną z bazy danych"""
     connection, cursor = connect_to_db()
     try:
-        cursor.execute("SELECT MESSAGE FROM DAILY_INSPIRATIONS ORDER BY NEWID()")
+        cursor.execute("SELECT MESSAGE FROM DAILY_INSPIRATIONS ORDER BY RAND()")
         result = cursor.fetchone()
         disconnect_from_db(connection, cursor)
         if result:
@@ -353,7 +353,7 @@ def get_daily_inspiration():
             return "Każdy dzień to nowa szansa na lepszą wersję siebie!"
     except Exception as e:
         disconnect_from_db(connection, cursor)
-        return "Małe kroki prowadzą do wielkich celów - jesteś na dobrej drodze!"
+        return "Małe kroki prowadzą do wielkich celów!"
 
 
 # FUNKCJE DLA NAWYKÓW

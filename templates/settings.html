@@ -4,61 +4,57 @@
 
 {% block body %}
 <div class="container">
-    <div class="settings-header">
-        <h1>Ustawienia konta</h1>
-        <p class="subtitle">Dostosuj aplikację do swoich preferencji</p>
+    <div class="big-box box-purple">
+        <div class="settings-header">
+            <h1>Ustawienia konta</h1>
+            <p class="subtitle">Dostosuj aplikację do swoich preferencji</p>
+        </div>
     </div>
 
-
-
     <div class="settings-content">
-        <!-- Formularz ustawień -->
-        <div class="settings-card">
-            <h2>Personalizacja</h2>
-            <form method="POST" action="{{ url_for('settings') }}">
-                {{ form.hidden_tag() }}
+        <!-- Formularz ustawień - JEDEN FORMULARZ dla wszystkich pól -->
+        <div class="big-box box-yellow">
+            <div class="settings-card">
+                <form method="POST" action="{{ url_for('settings') }}">
+                    {{ form.hidden_tag() }}
 
-                <div class="settings-group">
-                    <h3>Preferencje</h3>
+                    <div class="settings-group">
+                        <h3>Preferencje</h3>
 
-                    <div class="setting-item">
-                        {{ form.daily_inspirations() }}
-                        {{ form.daily_inspirations.label }}
-                        <span class="setting-description">Codzienne inspiracje i motywacyjne cytaty w sekcji nawyków</span>
+                        <div class="setting-item">
+                            {{ form.daily_inspirations() }}
+                            {{ form.daily_inspirations.label }}
+                        </div>
+
+                        <div class="setting-item">
+                            {{ form.show_notifications() }}
+                            {{ form.show_notifications.label }}
+                        </div>
                     </div>
 
-                    <div class="setting-item">
-                        {{ form.show_notifications() }}
-                        {{ form.show_notifications.label }}
-                        <span class="setting-description">Pokazuj powiadomienia i komunikaty w aplikacji</span>
-                    </div>
-                </div>
-
-                <div class="settings-group">
-                    <h3>Dane konta</h3>
-
-                    <div class="form-group">
-                        {{ form.handle.label(class="form-label") }}
-                        {{ form.handle(class="form-input", placeholder="Wpisz nazwe") }}
-
-                    </div>
-
-                    <div class="form-group">
-                        {{ form.new_password.label(class="form-label") }}
-                        {{ form.new_password(class="form-input", placeholder="Zostaw puste jeśli nie chcesz zmieniać") }}
-
+                    <div class="settings-group">
+                        <h3>Dane konta</h3>
+                        <div class="form-group">
+                            {{ form.handle.label(class="form-label") }}
+                            {{ form.handle(class="form-input", placeholder="Wpisz nazwę") }}
+                        </div>
+                        <div class="form-group">
+                            {{ form.new_password.label(class="form-label") }}
+                            {{ form.new_password(class="form-input", placeholder="Zostaw puste jeśli nie chcesz zmieniać") }}
+                        </div>
+                        <div class="form-group">
+                            {{ form.confirm_password.label(class="form-label") }}
+                            {{ form.confirm_password(class="form-input", placeholder="Powtórz nowe hasło") }}
+                        </div>
                     </div>
 
-                    <div class="form-group">
-                        {{ form.confirm_password.label(class="form-label") }}
-                        {{ form.confirm_password(class="form-input", placeholder="Powtórz nowe hasło") }}
+                    <div class="form-actions">
+                        {{ form.submit(class="btn btn-primary") }}
+                        <a href="{{ url_for('profile') }}" class="btn btn-secondary">Anuluj</a>
                     </div>
-                </div>
-
-                <div class="form-actions">
-                    {{ form.submit(class="btn btn-primary") }}
-                    <a href="{{ url_for('profile') }}" class="btn btn-secondary">Anuluj</a>
-                </div>
-            </form>
+                </form>
+            </div>
         </div>
+    </div>
+</div>
 {% endblock %}

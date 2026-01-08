@@ -5,23 +5,16 @@
 {% block body %}
 <main class="ranking-page">
     <div class="container">
-        <header class="ranking-header">
-            <h1 class="ranking=title">
-                <span class="ranking-icon">🏆</span>
-                Ranking Top 10
-            </h1>
-            <p class="subtitle">Najlepsi użytkownicy według punktów z <strong>wyzwań</strong></p>
-        </header>
+        <div class="big-box box-purple">
+            <header class="ranking-header">
+                <h1 class="ranking=title">
+                    <span class="ranking-icon"></span>
+                    Ranking Top 10
+                </h1>
+                <p class="subtitle">Najlepsi użytkownicy według punktów z <strong>wyzwań</strong></p>
+            </header>
+        </div>
         <!-- Informacje o rankingu -->
-         <section class="ranking-info">
-            <div class="info-card">
-                <h2 class="info-title">
-                    <span >
-                       📊Informacje o rankingu
-                    </span>
-                </h2>
-            </div>
-         </section>
          <!-- Lista -->
           <section class="ranking-section">
             <h2 class="list-titte">Lista wyników</h2>
@@ -36,11 +29,11 @@
                 {% endif %}">
                     <div class="ranking-medal">
                         {% if loop.index == 1 %}
-                        <span class="medal-icon">🥇 Złoty medal</span>
+                        <span class="medal-icon">1 miejsce</span>
                         {% elif loop.index == 2 %}
-                        <span class="medal-icon">🥈 Srebrny medal</span>
+                        <span class="medal-icon">2 miejsce</span>
                         {% elif loop.index == 3 %}
-                        <span class="medal-icon">🥉 Brązowy medal</span>
+                        <span class="medal-icon">3 miejsce</span>
                         {% else %}
                         <span class="ranking-number">#{{ loop.index }}</span>
                         {% endif %}
@@ -56,14 +49,13 @@
                             <span class="points-value">{{ user[1] }}</span>
                             <span class="points-label">punktów</span>
                         </div>
-                        <span class="points-source">z wyzwań</span>
                     </div>
                 </article>
                 {% endfor %}
             </div>
             {% else %}
             <div class="empty-ranking">
-                <div class="empty-icon">📝</div>
+                <!--<div class="empty-icon"></div>-->
                 <h3 class="empty-title">Brak użytkowników w rankingu</h3>
                 <p class="empty-description">Dołącz do wyzwań i zdobądź pierwsze punkty rankingowe!</p>
             </div>

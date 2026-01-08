@@ -28,47 +28,51 @@
     <div class="inspiration-card">
         <div class="inspiration-content">
             <h3>Dzisiejsza inspiracja</h3>
-            <p>{{ daily_inspiration }}</p>
+            <p class="inspiration">{{ daily_inspiration }}</p>
         </div>
     </div>
     {% endif %}
 
     <!-- Formularz dodawania nawyku -->
-    <div class="card">
-        <h2>➕ Dodaj nowy nawyk</h2>
-        <form method="POST" action="{{ url_for('add_habit') }}" class="habit-form">
-            {{ habit_form.hidden_tag() }}
+     <div class="big-box box-blue">
+        <div class="card">
+            <h2>➕ Dodaj nowy nawyk</h2>
+            <form method="POST" action="{{ url_for('add_habit') }}" class="habit-form">
+                {{ habit_form.hidden_tag() }}
 
-            <div class="form-habit">
-                <div class="form-group">
-                    {{ habit_form.name.label(class="form-label") }}
-                    {{ habit_form.name(class="form-input", placeholder="np. Picie wody") }}
-                </div>
-                <div class="form-group">
-                    {{ habit_form.target_value.label(class="form-label") }}
-                    {{ habit_form.target_value(class="form-input", placeholder="8") }}
-                </div>
-                <div class="form-group">
-                    {{ habit_form.unit.label(class="form-label") }}
-                    {{ habit_form.unit(class="form-input", placeholder="szklanki") }}
-                </div>
-                <div class="form-group">
-                    {{ habit_form.category.label }}
-                    {{ habit_form.category() }}
-                </div>
-            </div>
+                <div class="form-habit">
+                    <div class="form-group">
+                        {{ habit_form.name.label(class="form-label") }}
+                        {{ habit_form.name(class="form-input", placeholder="np. Picie wody") }}
+                    </div>
+                    <div class="form-group">
+                        {{ habit_form.target_value.label(class="form-label") }}
+                        {{ habit_form.target_value(class="form-input", placeholder="8") }}
+                    </div>
+                    <div class="form-group">
+                        {{ habit_form.unit.label(class="form-label") }}
+                        {{ habit_form.unit(class="form-input", placeholder="szklanki") }}
+                    </div>
+                    <div class="form-group">
+                        {{ habit_form.category.label(class="form-label") }}
+                        {{ habit_form.category(class="form-input") }}
+                    </div>
 
-            <div class="form-group">
-                {{ habit_form.description.label(class="form-label") }}
-                {{ habit_form.description(class="form-input", placeholder="Opis nawyku...") }}
-            </div>
+                </div>
 
-            {{ habit_form.submit(class="btn") }}
-        </form>
+                <div class="form-group">
+                    {{ habit_form.description.label(class="form-label") }}
+                    {{ habit_form.description(class="form-input", placeholder="Opis nawyku...") }}
+                </div>
+
+                {{ habit_form.submit(class="btn") }}
+            </form>
+        </div>
     </div>
 
     <!-- Lista nawyków -->
     <div class="habits-list">
+        <h2>Lista nawyków</h2>
         {% for habit in habits %}
         <div class="habit-card">
             <div class="habit-header">

@@ -56,7 +56,6 @@
     </div>
     <!-- GŁÓWNA ZAWARTOŚĆ -->
     <div class="profile-content">
-        <!-- LEWA KOLUMNA - CELE -->
         <div class="big-box box-yellow">
             <div class="content-column">
                 <section class="goals-section">
@@ -160,7 +159,7 @@
             </div>
         </div>
 
-        <!-- PRAWA KOLUMNA - WYZWANIA I ODZNAKI -->
+
         <div class="big-box box-red">
             <!-- WYZWANIA -->
             <section class="challenges-section">
@@ -179,7 +178,7 @@
                             <h3 class="challenge-title">{{ challenge.name }}</h3>
                             <div class="challenge-badges">
                                 <span class="challenge-level challenge-level--{{ challenge.level | lower }}">
-                                    {{ challenge.level }}
+                                    <strong>Level:  </strong>  {{ challenge.level }}
                                 </span>
                                 <span class="challenge-xp">+{{ challenge.xp }} XP</span>
                             </div>
@@ -221,6 +220,7 @@
                 {% endif %}
             </section>
         </div>
+
         <div class="big-box box-purple">
             <!-- ODZNAKI -->
             <section class="badges-section">
