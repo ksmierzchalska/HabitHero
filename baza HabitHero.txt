@@ -1,0 +1,165 @@
+
+CREATE TABLE USERS (
+    ID INT AUTO_INCREMENT PRIMARY KEY,
+    EMAIL VARCHAR(255) UNIQUE NOT NULL,
+    PASSWORD VARCHAR(255) NOT NULL,
+    FIRSTNAME VARCHAR(100) NOT NULL,
+    LASTNAME VARCHAR(100) NOT NULL,
+    HANDLE VARCHAR(100) UNIQUE NOT NULL,
+    IS_ADMIN TINYINT(1) DEFAULT 0,
+    CREATED_DATE DATETIME DEFAULT CURRENT_TIMESTAMP,
+    MODIFIED_DATE DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    LEVEL_POINTS INT DEFAULT 0,
+    LEVEL_THRESHOLD INT DEFAULT 250,
+    CURRENT_LEVEL INT DEFAULT 1,
+    TOTAL_POINTS INT DEFAULT 0,
+    RANKING_POINTS INT DEFAULT 0,
+    DAILY_INSPIRATIONS TINYINT(1) DEFAULT 1,
+    SHOW_NOTIFICATIONS TINYINT(1) DEFAULT 1
+);
+
+CREATE TABLE SECTION (
+    ID INT AUTO_INCREMENT PRIMARY KEY,
+    NAME VARCHAR(100) NOT NULL
+);
+
+
+CREATE TABLE CHALLENGES (
+    ID INT AUTO_INCREMENT PRIMARY KEY,
+    NAME VARCHAR(255) NOT NULL,
+    SECTION_ID INT,
+    DURATION_DAYS INT NOT NULL,
+    LEVEL VARCHAR(50) NOT NULL,
+    XP INT NOT NULL,
+    IS_ACTIVE TINYINT(1) DEFAULT 1,
+    FOREIGN KEY (SECTION_ID) REFERENCES SECTION(ID)
+);
+
+
+CREATE TABLE USERCHALLENGES (
+    USERID INT,
+    CHALLENGEID INT,
+    JoinedAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+    CompletedAt DATETIME NULL,
+    PRIMARY KEY (USERID, CHALLENGEID),
+    FOREIGN KEY (USERID) REFERENCES USERS(ID),
+    FOREIGN KEY (CHALLENGEID) REFERENCES CHALLENGES(ID)
+);
+CREATE TABLE MAINGOALS (
+    ID INT AUTO_INCREMENT PRIMARY KEY,
+    NAME VARCHAR(255) NOT NULL,
+    DURATION_DAYS INT NOT NULL,
+    USER_ID INT,
+    IS_ACTIVE TINYINT(1) DEFAULT 1,
+    CREATED DATETIME DEFAULT CURRENT_TIMESTAMP,
+    END_DATE DATETIME NULL,
+    FOREIGN KEY (USER_ID) REFERENCES USERS(ID)
+);
+
+
+CREATE TABLE HABITS (
+    ID INT AUTO_INCREMENT PRIMARY KEY,
+    USER_ID INT,
+    NAME VARCHAR(255) NOT NULL,
+    DESCRIPTION TEXT NULL,
+    TARGET_VALUE INT NOT NULL,
+    CURRENT_VALUE INT DEFAULT 0,
+    UNIT VARCHAR(50) NULL,
+    CATEGORY VARCHAR(50) NULL,
+    COLOR VARCHAR(20) DEFAULT '#3B82F6',
+    STREAK_DAYS INT DEFAULT 0,
+    BEST_STREAK INT DEFAULT 0,
+    IS_ACTIVE TINYINT(1) DEFAULT 1,
+    CREATED_DATE DATETIME DEFAULT CURRENT_TIMESTAMP,
+    UPDATED_DATE DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    LAST_RESET_DATE DATE NULL,
+    FREQUENCY VARCHAR(20) DEFAULT 'daily',
+    FOREIGN KEY (USER_ID) REFERENCES USERS(ID)
+);
+
+
+CREATE TABLE HABIT_LOGS (
+    ID INT AUTO_INCREMENT PRIMARY KEY,
+    HABIT_ID INT,
+    VALUE_ACHIEVED INT NOT NULL,
+    TARGET_VALUE INT NOT NULL,
+    LOG_DATE DATE DEFAULT (CURRENT_DATE),
+    FOREIGN KEY (HABIT_ID) REFERENCES HABITS(ID)
+);
+
+
+CREATE TABLE BADGES (
+    ID INT AUTO_INCREMENT PRIMARY KEY,
+    NAME VARCHAR(100) NOT NULL,
+    DESCRIPTION VARCHAR(255) NULL,
+    REQUIRED_POINTS INT NOT NULL,
+    CATEGORY VARCHAR(50) DEFAULT 'general'
+);
+
+CREATE TABLE USER_BADGES (
+    USER_ID INT,
+    BADGE_ID INT,
+    EARNED_AT DATETIME DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (USER_ID, BADGE_ID),
+    FOREIGN KEY (USER_ID) REFERENCES USERS(ID),
+    FOREIGN KEY (BADGE_ID) REFERENCES BADGES(ID)
+);
+
+
+CREATE TABLE DAILY_INSPIRATIONS (
+    ID INT AUTO_INCREMENT PRIMARY KEY,
+    MESSAGE TEXT NOT NULL
+);
+
+
+
+INSERT INTO SECTION (NAME) VALUES 
+('Zdrowie'),
+('Fitness'),
+('Produktywność'),
+('Rozwój osobisty'),
+('Środowisko');
+
+INSERT INTO CHALLENGES (NAME, SECTION_ID, DURATION_DAYS, LEVEL, XP) VALUES
+('30 dni bez cukru', 1, 30, 'średni', 300),
+('10 000 kroków dziennie', 2, 21, 'niski', 200),
+('Medytacja 10 min dziennie', 4, 30, 'niski', 250),
+('Czytanie 20 stron dziennie', 4, 30, 'średni', 350),
+('Trening siłowy 3x w tygodniu', 2, 28, 'wysoki', 500),
+('Zero plastiku przez tydzień', 5, 7, 'średni', 150),
+('Poranne wstawanie 6:00', 3, 21, 'wysoki', 400);
+
+
+INSERT INTO BADGES (NAME, DESCRIPTION, REQUIRED_POINTS, CATEGORY) VALUES
+('Pierwszy Strzał', 'Mały krok, wielki początek', 250, 'general'),
+('Solidna Piątka', 'Już coś konkretnego!', 500, 'general'),
+('Złoty Środek', 'Idealnie wyważona nagroda', 750, 'general'),
+('Tysiąc Marzeń', 'Czas spełniać pierwsze plany', 1000, 'general'),
+('Poziom Premium', 'Wchodzisz poziom wyżej', 1250, 'general'),
+('Półtorak Szczęścia', 'Więcej niż się spodziewasz', 1500, 'general'),
+('Mocny Zastrzyk', 'Energia do działania', 1750, 'general'),
+('Gruba Dwójka', 'Tu zaczyna się prawdziwa gra', 2000, 'general'),
+('Elitarny Pakiet', 'Dla tych, którzy celują wysoko', 2250, 'general'),
+('Kosmiczny Skok', 'Lecimy poza standard', 2500, 'general'),
+('Liga Mistrzów', 'Nieliczni dochodzą tak daleko', 2750, 'general'),
+('Złoty Finał', 'Najwyższa stawka. Największa nagroda.', 3000, 'general'),
+('Passa 7 dni', '7 dni z rzędu z wykonanymi nawykami!', 7, 'streak'),
+('Passa 14 dni', 'Dwie pełne tygodnie konsekwencji!', 14, 'streak'),
+('Miesiąc dyscypliny', '30 dni nieprzerwanej pracy nad sobą!', 30, 'streak'),
+('Siła woli', '60 dni bez przerwy!', 60, 'streak'),
+('Niezniszczalny', '90 dni perfekcyjnej konsekwencji!', 90, 'streak');
+
+
+INSERT INTO DAILY_INSPIRATIONS (MESSAGE) VALUES
+('Każdy dzień to nowa szansa na lepszą wersję siebie!'),
+('Małe kroki prowadzą do wielkich celów!'),
+('Dyscyplina to most między marzeniami a rzeczywistością!'),
+('Nie czekaj na idealny moment, takiego nie będzie!'),
+('Najlepszy czas na posadzenie drzewa był 20 lat temu. Drugi najlepszy czas jest teraz!'),
+('Wytrwałość zamienia ''nie wiem jak'' w ''to było łatwe''!'),
+('Sukces to suma małych wysiłków powtarzanych dzień po dniu!'),
+('Twoja przyszła ja będzie Ci wdzięczna za to, co robisz dzisiaj!');
+
+CREATE INDEX ranking_points_idx ON USERS(RANKING_POINTS);
+CREATE INDEX user_active_idx ON HABITS(USER_ID, IS_ACTIVE);
+CREATE INDEX log_date_idx ON HABIT_LOGS(LOG_DATE);
