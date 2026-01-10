@@ -123,11 +123,11 @@
                     </div>
                     <div class="habit-actions">
                         <form method="POST" action="{{ url_for('activate_habit', habit_id=habit[0]) }}">
-                            <button type="submit" class="btn-action">▶️ Aktywuj</button>
+                            <button type="submit" class="btn-action">Aktywuj</button>
                         </form>
                         <form method="POST" action="{{ url_for('delete_habit_permanently', habit_id=habit[0]) }}"
                               onsubmit="return confirm('Na pewno usunąć ten nawyk?')">
-                            <button type="submit" class="btn-action">🗑️ Usuń</button>
+                            <button type="submit" class="btn-action">Usuń</button>
                         </form>
                     </div>
                 </div>

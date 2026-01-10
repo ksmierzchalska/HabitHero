@@ -40,7 +40,7 @@
             {% set percentage = ((progress / maxp) * 100) | round | int %}
             <div class="profile-info">
                 <h1 class="profile-title">
-                    <span class="profile-avatar">👤</span>
+                    <span class="profile-avatar"><span class="material-symbols-outlined">person</span></span>
                     {{ user.handle }}
                 </h1>
                 <p class="profile-level">Poziom {{ user.display_level or 1 }} | {{ total }} / {{ total - progress + maxp }} doświadczenia</p>
@@ -61,7 +61,7 @@
                 <section class="goals-section">
                     <header class="section-header">
                         <h2 class="section-title">
-                            <span class="section-icon">🎯</span>
+                            <span class="profile-icon"><span class="material-symbols-outlined">Strategy</span></span>
                             Twoje cele
                         </h2>
                     </header>
@@ -126,12 +126,10 @@
                                     </header>
                                     <footer class="goal-actions">
                                         <a href="?edit={{ goal.id }}" class="btn btn--outline">
-                                            <span class="btn-icon">✏️</span>
                                             Edytuj
                                         </a>
                                         <form method="POST" action="{{ url_for('complete_goal', goal_id=goal.id) }}" class="action-form">
                                             <button type="submit" class="btn btn--success">
-                                                <span class="btn-icon">✅</span>
                                                 Zakończ
                                             </button>
                                         </form>
@@ -139,7 +137,6 @@
                                             <button type="submit" class="btn btn--danger"
                                                     data-goal-name="{{ goal.name }}"
                                                     onclick="return confirmDelete(this)">
-                                                <span class="btn-icon">🗑️</span>
                                                 Usuń
                                             </button>
                                         </form>
@@ -149,9 +146,9 @@
                             {% endfor %}
                         {% else %}
                         <div class="empty-state">
-                            <div class="empty-state__icon">🎯</div>
+
                             <h3 class="empty-state__title">Brak aktywnych celów</h3>
-                            <p class="empty-state__description">Dodaj swój pierwszy cel, aby rozpocząć podróż!</p>
+                            <p class="subtitle">Dodaj swój pierwszy cel, aby rozpocząć podróż!</p>
                         </div>
                         {% endif %}
                     </div>
@@ -165,7 +162,7 @@
             <section class="challenges-section">
                 <header class="section-header">
                     <h2 class="section-title">
-                        <span class="section-icon">⚔️</span>
+                        <span class="profile-icon"><span class="material-symbols-outlined">Swords</span></span>
                         Aktywne wyzwania
                     </h2>
                 </header>
@@ -200,7 +197,6 @@
                         <footer class="challenge-actions">
                             <form method="POST" action="{{ url_for('complete_challenge', challenge_id=challenge.id) }}">
                                 <button type="submit" class="btn btn--success btn--small">
-                                    <span class="btn-icon">🏁</span>
                                     Ukończ
                                 </button>
                             </form>
@@ -210,9 +206,9 @@
                 </div>
                 {% else %}
                 <div class="empty-state">
-                    <div class="empty-state__icon">⚔️</div>
+
                     <h3 class="empty-state__title">Brak aktywnych wyzwań</h3>
-                    <p class="empty-state__description">Dołącz do wyzwań, aby zdobywać punkty rankingowe!</p>
+                    <p class="subtitle">Dołącz do wyzwań, aby zdobywać punkty rankingowe!</p>
                     <a href="{{ url_for('challenges') }}" class="empty-state__action btn btn--primary">
                         Przejdź do wyzwań
                     </a>
@@ -226,7 +222,7 @@
             <section class="badges-section">
                 <header class="section-header">
                     <h2 class="section-title">
-                        <span class="section-icon">🏆</span>
+                        <span class="profile-icon"><span class="material-symbols-outlined">Trophy</span></span>
                         Twoje odznaki
                         <span class="section-count">({{ user_badges|length }})</span>
                     </h2>
@@ -236,7 +232,7 @@
                 <div class="badges-grid">
                     {% for badge in user_badges %}
                     <article class="badge-card">
-                        <div class="badge-icon">🏅</div>
+                        <div class="badge-icon"><span class="material-symbols-outlined">Trophy</span></div>
                         <div class="badge-content">
                             <h3 class="badge-title">{{ badge[1] }}</h3>
                             <p class="badge-description">{{ badge[2] }}</p>
@@ -249,9 +245,8 @@
                 </div>
                 {% else %}
                 <div class="empty-state">
-                    <div class="empty-state__icon">🏆</div>
                     <h3 class="empty-state__title">Jeszcze nie masz odznak</h3>
-                    <p class="empty-state__description">Zdobywaj punkty i ukończ wyzwania, aby zdobywać odznaki!</p>
+                    <p class="subtitle">Zdobywaj punkty i ukończ wyzwania, aby zdobywać odznaki!</p>
                 </div>
                 {% endif %}
             </section>

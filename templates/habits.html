@@ -7,8 +7,8 @@
 <div class="badge-notification">
     <div class="badge-overlay"></div>
     <div class="badge-popup">
-        <h3>🎉 Nowa Odznaka! 🎉</h3>
-        <div class="badge-icon-large">🔥</div>
+        <h3>Nowa Odznaka!</h3>
+        <!--<div class="badge-icon-large">🔥</div>-->
         <h4>{{ badge.name }}</h4>
         <p>{{ badge.description }}</p>
         <p class="points">Zdobyto za {{ badge.days }} dni passy!</p>
@@ -36,7 +36,7 @@
     <!-- Formularz dodawania nawyku -->
      <div class="big-box box-blue">
         <div class="card">
-            <h2>➕ Dodaj nowy nawyk</h2>
+            <h2>Dodaj nowy nawyk</h2>
             <form method="POST" action="{{ url_for('add_habit') }}" class="habit-form">
                 {{ habit_form.hidden_tag() }}
 

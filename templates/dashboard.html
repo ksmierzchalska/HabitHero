@@ -71,9 +71,9 @@
                 </div>
                 <div class="subtitle">
                     {% if current_streak > 0 %}
-                        🔥 Passa: <strong>{{ current_streak }} dni</strong> z rzędu!
+                         Passa: <strong>{{ current_streak }} dni</strong> z rzędu!
                     {% else %}
-                        💪 Zacznij nową passę już dziś!
+                         Zacznij nową passę już dziś!
                     {% endif %}
                 </div>
             </div>
@@ -117,7 +117,7 @@
                     <div class="badges-container">
                         {% for badge in user_streak_badges %}
                         <div class="badge-item">
-                            <div class="badge-icon">🔥</div>
+                            <div class="badge-icon"><span class="material-symbols-outlined">Trophy</span></div>
                             <div class="badge-details">
                                     <strong>{{ badge[1] }}</strong>
                                     <p>{{ badge[2] }}</p>
