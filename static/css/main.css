@@ -610,12 +610,29 @@ select{
 
 .ranking-item {
     display: flex;
-    justify-content: space-between;
+    justify-content: space-between; /* równo rozłożone */
     align-items: center;
-    padding: 18px 20px;
+    padding: 15px 20px;
     border-radius: 16px;
-    box-shadow: 0 0 12px -3px rgba(0,0,0,0.4);
-    transition: transform .2s;
+    margin-bottom: 10px;
+    width: 100%;
+}
+
+.ranking-medal,
+.user-info,
+.user-stats {
+    flex: 1; /* wszystkie mają równą szerokość */
+    text-align: center;
+    padding: 0 10px;
+}
+
+.ranking-medal {
+    text-align: left;
+}
+
+.user-stats {
+    text-align: right;
+}nsition: transform .2s;
 }
 
 .ranking-item:hover {
@@ -1077,7 +1094,7 @@ select{
 }
 
 .badge-card {
-    background: var(--c3); /* pastelowy niebieski jak Twoje karty */
+    background: var(--c3);
     border-radius: 18px;
     padding: 20px;
     width: 240px;
@@ -1153,22 +1170,26 @@ select{
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 10px;
     font-size: 40px;
     font-family: "Trade Winds", system-ui;
     color: #4b594a;
-    text-align: center;
     font-weight: normal;
     margin: 20px 0 0;
 }
-.section-title .profile-icon {
-    display: flex;
-    align-items: center;
-}
 
 .section-title .material-symbols-outlined {
-    font-size: 40px; /* Mniejsza ikona niż w avatarze */
-    vertical-align: middle;
+    font-size: 40px;
+    margin-right: 8px;
+}
+}
+
+
+}
+
+/* Zmniejsza odstęp między ikoną a tekstem */
+/*.section-title {*/
+    gap: 5px !important; /* Zmniejsz z 10px na 5px */
+/*}*/
 }
 .profile-title {
     display: flex;
@@ -1219,6 +1240,7 @@ select{
     justify-content: center;
     text-align: center;
 }
+
 
 
 
@@ -1301,17 +1323,28 @@ select{
         top: 100%;
         bottom: auto;
     }
-    .filters {
-        flex-wrap: wrap;
-        gap: 12px;
-    }
+    /*.filters {*/
+    /*    flex-wrap: wrap;*/
+    /*    gap: 12px;*/
+    /*}*/
 
-    .filter-btn {
-        width: 48%;
-    }
+    /*.filter-btn {*/
+    /*    width: 48%;*/
+    /*}*/
 
     .detail-row {
         width: 80%;
+    }
+    .filters {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+    }
+
+    .filter-btn {
+        width: 100% !important;
+        margin: 0 !important;
+        display: block;
     }
 }
 @media screen and (max-width: 600px) {
@@ -1413,6 +1446,43 @@ select{
         white-space: nowrap;
     }
 
+.challenges-page .join-btn {
+        padding: 6px 8px !important;
+        font-size: 12px !important;
+        min-width: auto !important;
+        width: 100% !important;
+        white-space: normal;
+        line-height: 1.2;
+        margin: 0 !important;
+    }
+
+    .challenges-page td:last-child {
+        padding: 6px 4px !important;
+        min-width: 80px;
+    }
+
+    .challenges-page th,
+    .challenges-page td {
+        padding: 8px 3px !important;
+        font-size: 13px;
+    }
+
+    .challenges-page th:nth-child(5),
+    .challenges-page td:nth-child(5) {
+        width: 90px; /* Stała szerokość dla kolumny z przyciskiem */
+        max-width: 90px;
+    }
+      .filters {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+    }
+
+    .filter-btn {
+        width: 100% !important;
+        margin: 0 !important;
+        display: block;
+    }
 
 
 

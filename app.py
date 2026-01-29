@@ -31,13 +31,12 @@ def disconnect_from_db(connection, cursor):
     if cursor:
         cursor.close()
 
-    # Close connection safely
     try:
         # Check if connection is open
         if connection and connection.open:
             connection.close()
     except MySQLdb.OperationalError as e:
-        print("Could not close connection:", e)
+        print("Nie można się połączyć:", e)
 
 # KONFIGURACJA APLIKACJI FLASK
 app = Flask(__name__)

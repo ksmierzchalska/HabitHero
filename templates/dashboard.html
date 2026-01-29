@@ -105,32 +105,34 @@
         </div>
 
         <!-- ODZNAKI ZA PASSY - POPRAWIONE -->
-        <div class="big-box box-purple">
-            <div class="section">
-                <h2>Twoje odznaki za passy</h2>
-                {% set user_streak_badges = [] %}
-                {% for badge in user_badges if badge[3] == 'streak' %}
-                    {% set _ = user_streak_badges.append(badge) %}
-                {% endfor %}
+        <!--
+        <!-- ODZNAKI ZA PASSY -->
+<div class="big-box box-purple">
+    <div class="section">
+        <h2>Twoje odznaki za passy</h2>
+        {% set user_streak_badges = [] %}
+        {% for badge in user_badges if badge[3] == 'streak' %}
+            {% set _ = user_streak_badges.append(badge) %}
+        {% endfor %}
 
-                {% if user_streak_badges %}
-                    <div class="badges-container">
-                        {% for badge in user_streak_badges %}
-                        <div class="badge-item">
-                            <div class="badge-icon"><span class="material-symbols-outlined">Trophy</span></div>
-                            <div class="badge-details">
-                                    <strong>{{ badge[1] }}</strong>
-                                    <p>{{ badge[2] }}</p>
-                                    <small>Zdobyto: {{ badge[4].strftime('%d.%m.%Y') }}</small>
-                            </div>
-                        </div>
-                        {% endfor %}
+        {% if user_streak_badges %}
+            <div class="badges-grid"> <!-- ZMIANA: badges-container → badges-grid -->
+                {% for badge in user_streak_badges %}
+                <article class="badge-card"> <!-- ZMIANA: badge-item → badge-card -->
+                    <div class="badge-icon"><span class="material-symbols-outlined">Trophy</span></div>
+                    <div class="badge-content">
+                        <h3 class="badge-title">{{ badge[1] }}</h3>
+                        <p class="badge-description">{{ badge[2] }}</p>
+                        <time class="badge-date">Zdobyto: {{ badge[4].strftime('%d.%m.%Y') }}</time>
                     </div>
-                {% else %}
-                    <p class="subtitle">Jeszcze nie zdobyłeś odznak za passy! Utrzymuj passę aby zdobyć odznaki.</p>
-                {% endif %}
+                </article>
+                {% endfor %}
             </div>
-        </div>
+        {% else %}
+            <p class="subtitle">Jeszcze nie zdobyłeś odznak za passy! Utrzymuj passę aby zdobyć odznaki.</p>
+        {% endif %}
+    </div>
+</div>
     </div>
 </div>
 
