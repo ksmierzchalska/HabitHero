@@ -601,38 +601,85 @@ select{
 }
 
 .ranking-list {
-    max-width: auto;
-    margin: auto;
+    max-width: 100%;
+    margin: 20px auto;
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 15px;
+    padding: 0 10px;
 }
 
 .ranking-item {
     display: flex;
-    justify-content: space-between; /* równo rozłożone */
+    justify-content: space-between;
     align-items: center;
     padding: 15px 20px;
     border-radius: 16px;
     margin-bottom: 10px;
     width: 100%;
-}
-
-.ranking-medal,
-.user-info,
-.user-stats {
-    flex: 1; /* wszystkie mają równą szerokość */
-    text-align: center;
-    padding: 0 10px;
+    box-sizing: border-box;
 }
 
 .ranking-medal {
+    flex: 0 0 100px;
     text-align: left;
+    min-width: 0;
+    overflow: hidden;
+}
+
+.user-info {
+    flex: 2;
+    min-width: 0;
+    overflow: hidden;
+    text-align: center;
 }
 
 .user-stats {
+    flex: 0 0 120px;
     text-align: right;
-}nsition: transform .2s;
+    min-width: 0;
+    overflow: hidden;
+}
+
+.user-name {
+    margin: 0 0 5px;
+    font-size: 26px;
+    color: #4b594a;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+
+
+.ranking-section {
+    margin: 30px 0;
+    padding: 0 15px;
+}
+
+.list-title {
+    font-size: 32px;
+    font-family: "Trade Winds", system-ui;
+    color: #4b594a;
+    text-align: center;
+    margin: 20px 0;
+    font-weight: normal;
+}
+
+/* Pusta lista rankingu */
+.empty-ranking {
+    text-align: center;
+    padding: 40px 20px;
+    background: var(--c3);
+    border-radius: 16px;
+    margin: 20px auto;
+    max-width: 600px;
+}
+
+.empty-title {
+    font-size: 24px;
+    color: #4b594a;
+    margin-bottom: 10px;
 }
 
 .ranking-item:hover {
@@ -1241,6 +1288,83 @@ select{
     text-align: center;
 }
 
+.badge-notification .badge-popup {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate3d(-50%, -50%, 0);
+    background: var(--c2);
+    padding: 20px;
+    border: 2px solid var(--c1);
+    box-shadow: 0 0 90px -15px #000;
+    text-align: center;
+    z-index: 2001;
+    border-radius: 16px;
+    max-width: 500px;
+    width: 90%;
+}
+
+.badge-notification .badge-popup h3 {
+    font-size: 26px;
+    font-family: "Trade Winds", system-ui;
+    color: #4b594a;
+    text-align: center;
+    font-weight: normal;
+    margin: 10px 0;
+}
+
+.badge-notification .badge-popup h4 {
+    font-size: 32px;
+    font-family: "Trade Winds", system-ui;
+    color: #4b594a;
+    text-align: center;
+    font-weight: normal;
+    margin: 15px 0;
+    text-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
+}
+
+.badge-notification .badge-popup p {
+    font-size: 16px;
+    color: #4b594a;
+    margin: 10px 0;
+    line-height: 1.4;
+}
+
+.badge-notification .badge-popup .points {
+    font-size: 18px;
+    font-weight: bold;
+    color: #4b594a;
+    margin: 15px 0;
+    padding: 8px 15px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    display: inline-block;
+}
+
+.badge-notification .badge-popup .countdown {
+    font-size: 14px;
+    color: #4b594a;
+    opacity: 0.8;
+    margin-top: 20px;
+    font-style: italic;
+}
+
+.badge-notification .badge-icon {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.badge-notification .badge-icon .material-symbols-outlined {
+    font-size: 60px;
+    color: #4b594a;
+    text-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
+}
+
+
+
+
 
 
 
@@ -1264,6 +1388,7 @@ select{
     .detail-row {
         width: 70%;
     }
+
 }
 @media screen and (max-width: 800px) {
     .nav li {
@@ -1346,6 +1471,114 @@ select{
         margin: 0 !important;
         display: block;
     }
+    .badge-notification .badge-popup {
+        width: 85%;
+        max-width: 380px;
+        padding: 16px;
+    }
+
+    .badge-notification .badge-popup::after {
+        width: auto;
+        left: 0;
+        right: 0;
+        bottom: 100%;
+        top: auto;
+    }
+
+    .badge-notification .badge-popup::before {
+        width: auto;
+        left: 0;
+        right: 0;
+        top: 100%;
+        bottom: auto;
+    }
+
+    .badge-notification .badge-popup h4 {
+        font-size: 26px;
+        line-height: 30px;
+        margin: 10px 0;
+    }
+
+    .badge-notification .badge-popup h3 {
+        font-size: 20px;
+        line-height: 24px;
+        margin: 8px 0;
+    }
+
+    .badge-notification .badge-popup p {
+        font-size: 15px;
+        line-height: 1.3;
+    }
+
+    .badge-notification .badge-popup .points {
+        font-size: 16px;
+        padding: 6px 12px;
+        margin: 12px 0;
+    }
+    .ranking-item {
+        padding: 12px 15px;
+        flex-wrap: nowrap;
+        gap: 8px;
+    }
+
+    .ranking-medal {
+        flex: 0 0 70px;
+        font-size: 14px;
+        min-width: 0;
+    }
+
+    .ranking-number,
+    .medal-icon {
+        font-size: 16px;
+        white-space: nowrap;
+    }
+
+    .user-info {
+        flex: 1;
+        min-width: 100px;
+        padding: 0 5px;
+    }
+
+    .user-name {
+        font-size: 18px;
+        margin-bottom: 3px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .user-details {
+        font-size: 14px;
+    }
+
+    .user-stats {
+        flex: 0 0 80px;
+        min-width: 0;
+    }
+
+    .points-display {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 2px;
+    }
+
+    .points-value {
+        font-size: 18px;
+        line-height: 1.1;
+    }
+
+    .points-label {
+        font-size: 11px;
+        line-height: 1;
+    }
+
+    .list-title {
+        font-size: 26px;
+        margin: 15px 0;
+    }
+
+
 }
 @media screen and (max-width: 600px) {
     .features-grid > ul > li{
@@ -1469,7 +1702,7 @@ select{
 
     .challenges-page th:nth-child(5),
     .challenges-page td:nth-child(5) {
-        width: 90px; /* Stała szerokość dla kolumny z przyciskiem */
+        width: 90px;
         max-width: 90px;
     }
       .filters {
@@ -1482,6 +1715,89 @@ select{
         width: 100% !important;
         margin: 0 !important;
         display: block;
+    }
+    .badge-notification .badge-popup {
+        width: 90%;
+        max-width: 320px;
+        padding: 14px;
+        margin-top: -20px;
+    }
+
+    .badge-notification .badge-popup h4 {
+        font-size: 22px;
+        line-height: 26px;
+    }
+
+    .badge-notification .badge-popup h3 {
+        font-size: 18px;
+        line-height: 22px;
+    }
+
+    .badge-notification .badge-popup p {
+        font-size: 14px;
+        margin: 6px 0;
+    }
+
+    .badge-notification .badge-popup .points {
+        font-size: 15px;
+        padding: 5px 10px;
+        margin: 10px 0;
+    }
+
+    .badge-notification .badge-popup .countdown {
+        font-size: 13px;
+        margin-top: 15px;
+    }
+
+    .badge-notification .badge-icon .material-symbols-outlined {
+        font-size: 48px;
+    }
+    .ranking-list {
+        padding: 0 5px;
+        gap: 10px;
+    }
+
+    .ranking-item {
+        padding: 10px 12px;
+        gap: 5px;
+        margin-bottom: 8px;
+    }
+
+    .ranking-medal {
+        flex: 0 0 60px;
+        font-size: 12px;
+    }
+
+    .ranking-number,
+    .medal-icon {
+        font-size: 14px;
+    }
+
+    .user-info {
+        flex: 1;
+        min-width: 80px;
+        padding: 0 3px;
+    }
+
+    .user-name {
+        font-size: 16px;
+        max-width: 120px;
+    }
+
+    .user-details {
+        font-size: 12px;
+    }
+
+    .user-stats {
+        flex: 0 0 70px;
+    }
+
+    .points-value {
+        font-size: 16px;
+    }
+
+    .points-label {
+        font-size: 10px;
     }
 
 

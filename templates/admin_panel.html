@@ -31,7 +31,7 @@
          </div>
     </div>
         <!-- Formularz dodawania wyzwania -->
-        <div class="big-box box-red">
+         <div class="big-box box-red">
             <section class="form-section">
                 <h2 class="form-title">Dodaj nowe wyzwanie</h2>
                 <form method="POST" action="{{ url_for('add_challenge') }}" class="admin-form">
@@ -42,7 +42,9 @@
                             {{ challenge_form.name.label(class="form-label") }}
                             {{ challenge_form.name(class="form-input", placeholder="Nazwa wyzwania") }}
                         </div>
+                    </div>
 
+                    <div class="form-row">
                         <div class="form-group">
                             {{ challenge_form.section_id.label(class="form-label") }}
                             {{ challenge_form.section_id(class="form-select") }}
@@ -54,12 +56,16 @@
                             {{ challenge_form.duration_days.label(class="form-label") }}
                             {{ challenge_form.duration_days(class="form-input", type="number", min="1", placeholder="Liczba dni") }}
                         </div>
+                    </div>
 
+                    <div class="form-row">
                         <div class="form-group">
                             {{ challenge_form.level.label(class="form-label") }}
                             {{ challenge_form.level(class="form-select") }}
                         </div>
+                    </div>
 
+                    <div class="form-row">
                         <div class="form-group">
                             {{ challenge_form.xp.label(class="form-label") }}
                             {{ challenge_form.xp(class="form-input", type="number", min="0", placeholder="Punkty XP") }}
